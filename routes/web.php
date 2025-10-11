@@ -5,12 +5,17 @@ use Inertia\Inertia;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\CategoryController;
 
-Route::get('/', [ItemController::class, 'index'])->name('items.index');
-Route::post('/items', [ItemController::class, 'store'])->name('items.store');
-Route::put('/items/{item}', [ItemController::class, 'update'])->name('items.update');
-Route::delete('/items/{item}', [ItemController::class, 'destroy'])->name('items.destroy');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/', [ItemController::class, 'index'])->name('items.index');
 
-Route::resource('categories', CategoryController::class)->except(['show', 'create', 'edit']);
+    Route::middleware('can:manage-inventory')->group(function () {
+        Route::post('/items', [ItemController::class, 'store'])->name('items.store');
+        Route::put('/items/{item}', [ItemController::class, 'update'])->name('items.update');
+        Route::delete('/items/{item}', [ItemController::class, 'destroy'])->name('items.destroy');
+
+        Route::resource('categories', CategoryController::class)->except(['show', 'create', 'edit']);
+    });
+});
 
 
 require __DIR__.'/settings.php';

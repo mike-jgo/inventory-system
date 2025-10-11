@@ -2,37 +2,38 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::all();
+        $categories = Category::orderBy('name')->get();
 
         return Inertia::render('Categories/Index', [
             'categories' => $categories,
         ]);
     }
 
-    public function store(Request $request)
+    public function store(CategoryRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name',
-        ]);
+        Gate::authorize('manage-inventory');
+
+        $validated = $request->validated();
 
         Category::create($validated);
 
         return redirect()->route('categories.index');
     }
 
-    public function update(Request $request, Category $category)
+    public function update(CategoryRequest $request, Category $category)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
-        ]);
+        Gate::authorize('manage-inventory');
+
+        $validated = $request->validated();
 
         $category->update($validated);
 
@@ -41,6 +42,16 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
+        Gate::authorize('manage-inventory');
+
+        if ($category->items()->exists()) {
+            return redirect()
+                ->route('categories.index')
+                ->withErrors([
+                    'category' => __('Unable to delete a category that still has items assigned.'),
+                ]);
+        }
+
         $category->delete();
 
         return redirect()->route('categories.index');

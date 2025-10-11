@@ -2,44 +2,46 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Item;
+use App\Http\Requests\ItemRequest;
 use App\Models\Category;
+use App\Models\Item;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
-use Illuminate\Http\Request;
 
 class ItemController extends Controller
 {
     public function index()
     {
-        $items = Item::with('category')->get();
-        $categories = Category::all();
+        $items = Item::with('category')
+            ->orderBy('name')
+            ->paginate()
+            ->withQueryString();
+
+        $categories = Category::orderBy('name')->get();
 
         return Inertia::render('ItemList/Index', [
-            'items' => $items,
+            'items' => $items->items(),
+            'pagination' => $items->toArray(),
             'categories' => $categories,
         ]);
     }
 
-    public function store(Request $request)
+    public function store(ItemRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
-            'quantity' => 'required|integer|min:0',
-        ]);
+        Gate::authorize('manage-inventory');
+
+        $validated = $request->validated();
 
         Item::create($validated);
 
         return redirect()->route('items.index');
     }
 
-    public function update(Request $request, Item $item)
+    public function update(ItemRequest $request, Item $item)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
-            'quantity' => 'required|integer|min:0',
-        ]);
+        Gate::authorize('manage-inventory');
+
+        $validated = $request->validated();
 
         $item->update($validated);
 
@@ -48,6 +50,8 @@ class ItemController extends Controller
 
     public function destroy(Item $item)
     {
+        Gate::authorize('manage-inventory');
+
         $item->delete();
         return redirect()->route('items.index');
     }

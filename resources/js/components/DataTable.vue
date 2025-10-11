@@ -41,13 +41,13 @@ const emit = defineEmits(['edit', 'delete']);
           <td class="px-6 py-4 text-sm space-x-2">
             <button
               class="px-3 py-1 rounded bg-blue-500 hover:bg-blue-600 text-white text-sm"
-              @click="$emit('edit', row)"
+              @click="emit('edit', row)"
             >
               Edit
             </button>
             <button
               class="px-3 py-1 rounded bg-red-500 hover:bg-red-600 text-white text-sm"
-              @click="$emit('delete', row)"
+              @click="emit('delete', row)"
             >
               Delete
             </button>

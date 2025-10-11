@@ -23,3 +23,10 @@ List of current Items, name, category, and quantity.
 - [ ] Create Categories
 - [ ] Update Categories
 - [ ] Remove Categories
+
+## Order Page
+- [ ] Show Orders
+- [ ] Create Orders
+    - [ ] Dine-in/Takeout/Online Options
+- [ ] Update Orders 
+    - [ ] Cancel Order (When a user cancels an order have two options 1. Wastage (Do not re-add stock) 2. Non-wastage(re-add stock))

@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Item;
 use App\Models\Category;
-use Inertia\Inertia;
+use App\Models\Item;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ItemController extends Controller
 {
     public function index()
     {
-        $items = Item::with('category')->get();
+        $items      = Item::with('category')->get();
         $categories = Category::all();
 
         return Inertia::render('ItemList/Index', [
-            'items' => $items,
+            'items'      => $items,
             'categories' => $categories,
         ]);
     }
@@ -23,9 +23,9 @@ class ItemController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name'        => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'quantity' => 'required|integer|min:0',
+            'quantity'    => 'required|integer|min:0',
         ]);
 
         Item::create($validated);
@@ -36,9 +36,9 @@ class ItemController extends Controller
     public function update(Request $request, Item $item)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name'        => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'quantity' => 'required|integer|min:0',
+            'quantity'    => 'required|integer|min:0',
         ]);
 
         $item->update($validated);
@@ -49,6 +49,7 @@ class ItemController extends Controller
     public function destroy(Item $item)
     {
         $item->delete();
+
         return redirect()->route('items.index');
     }
 }

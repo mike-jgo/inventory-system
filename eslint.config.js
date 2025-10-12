@@ -5,9 +5,8 @@ import tseslint from 'typescript-eslint';
 
 export default [
 	js.configs.recommended,
-	tseslint.configs.recommended, // ✅ no spread, just include the object
-	vue.configs['flat/recommended'],
-
+	...tseslint.configs.recommended,
+	...vue.configs['flat/recommended'],
 	{
 		ignores: ['node_modules/**']
 	},
@@ -21,7 +20,7 @@ export default [
 				browser: true,
 				node: true
 			},
-			parser: tseslint.parser, // ✅ parser comes from `typescript-eslint`
+			parser: tseslint.parser,
 			parserOptions: {
 				ecmaVersion: 'latest',
 				sourceType: 'module'

@@ -18,7 +18,7 @@ Logs actions done in Item List Page containing date of action, user, item name, 
 ## Users/Accounts
 
 - [x] Login Page
-- [ ] User Management
+- [x] User Management
 - [x] Logout
 - [x] Register Account
 - [ ] Forget Password

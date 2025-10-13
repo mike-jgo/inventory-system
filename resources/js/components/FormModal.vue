@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { router, useForm } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import { watch } from 'vue';
 
 const props = defineProps<{
 	resourceName: string; // e.g. "Item" or "Category"
 	mode: 'add' | 'edit';
 	submitUrl: string; // e.g. "/items" or `/categories/{id}`
-	method?: 'post' | 'put'; // default decided by mode
+	method?: 'post' | 'put'; // optional override
 	fields: {
 		key: string;
 		label: string;
@@ -29,7 +29,7 @@ const form = useForm(
 	)
 );
 
-// Reset if model changes (e.g. switching between different edits)
+// Reset when model changes
 watch(
 	() => props.model,
 	(newVal) => {
@@ -41,16 +41,14 @@ watch(
 );
 
 const submit = () => {
-	const method = props.mode === 'add' ? 'post' : 'put';
-	const data = { ...form.data() };
-
-	// Only remove password if it's blank
-	if ('password' in data && data.password === '') {
-		delete data.password;
-	}
-
-	// Use form helper (handles validation + errors automatically)
-	form[method](props.submitUrl, {
+	const method = props.method ?? (props.mode === 'add' ? 'post' : 'put');
+	form.transform((data) => {
+		if ('password' in data && data.password === '') {
+			const { password, ...rest } = data;
+			return rest;
+		}
+		return data;
+	})[method](props.submitUrl, {
 		onSuccess: () => {
 			form.reset();
 			emit('close');

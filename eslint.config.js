@@ -1,7 +1,8 @@
 import prettier from 'eslint-plugin-prettier';
 import vue from 'eslint-plugin-vue';
 import js from '@eslint/js';
-import tseslint from 'typescript-eslint';
+import tseslint from '@typescript-eslint/eslint-plugin';
+import tsparser from '@typescript-eslint/parser';
 
 export default [
 	js.configs.recommended,
@@ -10,9 +11,8 @@ export default [
 	{
 		ignores: ['node_modules/**']
 	},
-
 	{
-		files: ['**/*.js', '**/*.vue', '**/*.ts'],
+		files: ['**/*.js', '**/*.vue'],
 		languageOptions: {
 			globals: {
 				_: 'readonly',
@@ -20,10 +20,10 @@ export default [
 				browser: true,
 				node: true
 			},
-			parser: tseslint.parser,
 			parserOptions: {
-				ecmaVersion: 'latest',
-				sourceType: 'module'
+				ecmaVersion: 12,
+				sourceType: 'module',
+				parser: tsparser
 			}
 		},
 		plugins: {
@@ -44,8 +44,12 @@ export default [
 			'vue/max-attributes-per-line': [
 				'error',
 				{
-					singleline: { max: 1 },
-					multiline: { max: 1 }
+					singleline: {
+						max: 1
+					},
+					multiline: {
+						max: 1
+					}
 				}
 			]
 		}

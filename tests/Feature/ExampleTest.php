@@ -1,7 +1,7 @@
 <?php
-use Illuminate\Foundation\Testing\RefreshDatabase;
+
 it('returns a successful response', function () {
-    $response = $this->get('/');
+    $response = $this->get('/login');
 
     $response->assertStatus(200);
 });

@@ -2,18 +2,18 @@
 import Navbar from '@/components/Navbar.vue';
 
 defineProps<{
-  title?: string;
+	title?: string;
 }>();
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col bg-gray-100">
-    <!-- Navbar -->
-    <Navbar />
+	<div class="min-h-screen flex flex-col bg-gray-100">
+		<!-- Navbar -->
+		<Navbar />
 
-    <!-- Page Content -->
-    <main class="flex-1">
-      <slot />
-    </main>
-  </div>
+		<!-- Page Content -->
+		<main class="flex-1">
+			<slot />
+		</main>
+	</div>
 </template>

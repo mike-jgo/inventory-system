@@ -35,19 +35,24 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $data = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => "required|string|email|unique:users,email,{$user->id}",
+            'name' => 'required|string|max:255',
+            'email' => "required|string|email|unique:users,email,{$user->id}",
             'password' => 'nullable|string|min:8',
         ]);
 
-        $user->update([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
-            'password' => $data['password'] ? bcrypt($data['password']) : $user->password,
-        ]);
+        // 🧹 Remove empty or null password BEFORE updating
+        if (empty($data['password'])) {
+            unset($data['password']);
+        } else {
+            // Hash if present
+            $data['password'] = bcrypt($data['password']);
+        }
 
-        return redirect()->route('users.index')->with('success', 'User updated successfully.');
+        $user->update($data);
+
+        return back()->with('success', 'User updated successfully.');
     }
+
 
     public function destroy(User $user)
     {

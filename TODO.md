@@ -21,6 +21,7 @@ Logs actions done in Item List Page containing date of action, user, item name, 
 - [x] User Management
 - [x] Logout
 - [x] Register Account
+- [x] Change Password
 - [ ] Forget Password
 
 ## General Tasks
@@ -31,10 +32,10 @@ Logs actions done in Item List Page containing date of action, user, item name, 
 
 ## Categories Page
 
-- [ ] Show Categories
-- [ ] Create Categories
-- [ ] Update Categories
-- [ ] Remove Categories
+- [x] Show Categories
+- [x] Create Categories
+- [x] Update Categories
+- [x] Remove Categories
 
 ## Order Page
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
+import { router, useForm } from '@inertiajs/vue3';
 import { watch } from 'vue';
 
 const props = defineProps<{
@@ -42,11 +42,20 @@ watch(
 
 const submit = () => {
 	const method = props.mode === 'add' ? 'post' : 'put';
+	const data = { ...form.data() };
+
+	// Only remove password if it's blank
+	if ('password' in data && data.password === '') {
+		delete data.password;
+	}
+
+	// Use form helper (handles validation + errors automatically)
 	form[method](props.submitUrl, {
 		onSuccess: () => {
 			form.reset();
 			emit('close');
-		}
+		},
+		preserveScroll: true
 	});
 };
 </script>
@@ -94,7 +103,7 @@ const submit = () => {
 							:type="field.type"
 							:placeholder="`Enter ${field.label}`"
 							class="text-gray-700 mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm"
-							required
+							:required="!(field.key === 'password' && mode === 'edit')"
 						/>
 					</template>
 

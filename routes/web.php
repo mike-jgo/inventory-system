@@ -31,6 +31,11 @@ Route::middleware('web')->group(function () {
         Route::post('/users', [\App\Http\Controllers\UserController::class, 'store'])->name('users.store');
         Route::put('/users/{user}', [\App\Http\Controllers\UserController::class, 'update'])->name('users.update');
         Route::delete('/users/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('users.destroy');
+        Route::get('/activity-log', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-log.index');
+        Route::post('/activities/{id}/remarks', [\App\Http\Controllers\ActivityLogController::class, 'saveRemarks'])
+        ->name('activities.remarks');
+
+
 
         Route::resource('categories', CategoryController::class)
             ->except(['show', 'create', 'edit']);

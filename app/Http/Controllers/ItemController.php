@@ -5,13 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Item;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+
 
 class ItemController extends Controller
 {
     public function index()
     {
-        $items      = Item::with('category')->get();
+        $items      = Item::with('category')->paginate(10);
         $categories = Category::all();
 
         return Inertia::render('ItemList/Index', [
@@ -28,7 +30,14 @@ class ItemController extends Controller
             'quantity'    => 'required|integer|min:0',
         ]);
 
-        Item::create($validated);
+        $item = Item::create($validated);
+
+        //Log creation
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($item)
+            ->withProperties(['attributes' => $validated, 'severity' => 'information'])
+            ->log("Created a new item: {$item->name}");
 
         return redirect()->route('items.index');
     }
@@ -41,14 +50,34 @@ class ItemController extends Controller
             'quantity'    => 'required|integer|min:0',
         ]);
 
+        $old = $item->getOriginal();
         $item->update($validated);
+
+        //Log update
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($item)
+            ->withProperties([
+                'old' => $old,
+                'new' => $validated,
+                'severity' => 'information',
+            ])
+            ->log("Updated item: {$item->name}");
 
         return redirect()->route('items.index');
     }
 
     public function destroy(Item $item)
     {
+        $itemName = $item->name;
         $item->delete();
+
+        //Log deletion
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($item)
+            ->withProperties(['severity' => 'warning'])
+            ->log("Deleted item: {$itemName}");
 
         return redirect()->route('items.index');
     }

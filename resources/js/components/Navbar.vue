@@ -18,7 +18,8 @@ const logout = () => {
 const links = computed(() => {
 	const base = [
 		{ name: 'Items', href: route('items.index') },
-		{ name: 'Categories', href: route('categories.index') }
+		{ name: 'Categories', href: route('categories.index') },
+		{ name: 'Activity Log', href: route('activity-log.index') }
 	];
 	if (user.value) {
 		base.push({ name: 'Users', href: route('users.index') });

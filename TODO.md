@@ -13,7 +13,8 @@ List of current Items, name, category, and quantity.
 
 Logs actions done in Item List Page containing date of action, user, item name, current qty as of log, and sale/transaction, and qty after transaction.
 
-- [ ] Inventory
+- [x] Inventory Report
+- [x] View changes/details
 
 ## Users/Accounts
 
@@ -28,7 +29,11 @@ Logs actions done in Item List Page containing date of action, user, item name, 
 
 - [x] Navbar
 - [ ] Flash Message
-- [ ] Fix pagination on datatable component (Paginate doesn't work in controller as there are new page variables that are not yet in datatable)
+- [x] Fix pagination on datatable component (Paginate doesn't work in controller as there are new page variables that are not yet in datatable)
+- [ ] Create Roles
+- [ ] Create Permissions
+- [ ] Create Super Admin
+- [ ] Create User
 
 ## Categories Page
 
@@ -44,3 +49,4 @@ Logs actions done in Item List Page containing date of action, user, item name, 
     - [ ] Dine-in/Takeout/Online Options
 - [ ] Update Orders
     - [ ] Cancel Order (When a user cancels an order have two options 1. Wastage (Do not re-add stock) 2. Non-wastage(re-add stock))
+- [ ] Soft Delete Orders

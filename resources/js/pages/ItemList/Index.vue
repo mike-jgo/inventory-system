@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
+import { router, Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import Layout from '@/layouts/Layout.vue';
 import DataTable from '@/components/DataTable.vue';
@@ -12,12 +12,19 @@ defineOptions({
 
 defineProps<{
 	items: {
-		id: number;
-		name: string;
-		category_id: number | null;
-		category?: { id: number; name: string } | null;
-		quantity: number;
-	}[];
+		data: {
+			id: number;
+			name: string;
+			category_id: number | null;
+			category?: { id: number; name: string } | null;
+			quantity: number;
+		}[];
+		current_page: number;
+		last_page: number;
+		per_page: number;
+		total: number;
+		links: { url: string | null; label: string; active: boolean }[];
+	};
 	categories: { id: number; name: string }[];
 }>();
 
@@ -48,6 +55,10 @@ const openDeleteModal = (item: any) => {
 	itemToDelete.value = item;
 	showDelete.value = true;
 };
+
+const handlePaginate = (url: string | null) => {
+	if (url) router.visit(url, { preserveScroll: true });
+};
 </script>
 
 <template>
@@ -68,9 +79,11 @@ const openDeleteModal = (item: any) => {
 
 		<DataTable
 			:columns="itemColumns"
-			:rows="items"
+			:rows="items.data"
+			:pagination="items"
 			@edit="openEditModal"
 			@delete="openDeleteModal"
+			@paginate="handlePaginate"
 		/>
 
 		<!-- Add Modal -->

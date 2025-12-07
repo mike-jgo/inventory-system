@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import Layout from '@/layouts/Layout.vue';
 import DataTable from '@/components/DataTable.vue';
 import FormModal from '@/components/FormModal.vue';
@@ -10,13 +10,15 @@ defineOptions({
 	layout: Layout
 });
 
-defineProps<{
+const props = defineProps<{
 	users: {
 		id: number;
 		name: string;
 		email: string;
 		created_at: string;
+        roles?: { name: string }[];
 	}[];
+    roles: { id: number, name: string }[];
 }>();
 
 // Modals
@@ -31,13 +33,24 @@ const userToDelete = ref<any | null>(null);
 const userColumns = [
 	{ key: 'name', label: 'Name' },
 	{ key: 'email', label: 'Email' },
+    { key: 'role_names', label: 'Roles' },
 	{ key: 'created_at', label: 'Created' }
 ];
+
+const displayUsers = computed(() => props.users.map(u => ({
+    ...u,
+    role_names: u.roles?.map(r => r.name).join(', ') || ''
+})));
+
+const roleOptions = computed(() => props.roles.map(r => ({ value: r.name, label: r.name })));
 
 // Modal Handlers
 const openAddModal = () => (showAdd.value = true);
 const openEditModal = (user: any) => {
-	userToEdit.value = { ...user };
+	userToEdit.value = { 
+        ...user, 
+        roles: user.roles?.[0]?.name || '' 
+    };
 	showEdit.value = true;
 };
 const openDeleteModal = (user: any) => {
@@ -64,7 +77,7 @@ const openDeleteModal = (user: any) => {
 
 		<DataTable
 			:columns="userColumns"
-			:rows="users"
+			:rows="displayUsers"
 			@edit="openEditModal"
 			@delete="openDeleteModal"
 		/>
@@ -78,7 +91,8 @@ const openDeleteModal = (user: any) => {
 			:fields="[
 				{ key: 'name', label: 'Name', type: 'text' },
 				{ key: 'email', label: 'Email', type: 'email' },
-				{ key: 'password', label: 'Password', type: 'password' }
+				{ key: 'password', label: 'Password', type: 'password' },
+                { key: 'roles', label: 'Role', type: 'select', options: roleOptions }
 			]"
 			@close="showAdd = false"
 		/>
@@ -93,7 +107,8 @@ const openDeleteModal = (user: any) => {
 			:fields="[
 				{ key: 'name', label: 'Name', type: 'text' },
 				{ key: 'email', label: 'Email', type: 'email' },
-				{ key: 'password', label: 'New Password (optional)', type: 'password' }
+				{ key: 'password', label: 'New Password (optional)', type: 'password' },
+                { key: 'roles', label: 'Role', type: 'select', options: roleOptions }
 			]"
 			@close="showEdit = false"
 		/>

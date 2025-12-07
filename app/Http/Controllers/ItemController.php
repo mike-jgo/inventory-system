@@ -13,11 +13,11 @@ class ItemController extends Controller
 {
     public function index()
     {
-        $items      = Item::with('category')->paginate(10);
+        $items = Item::with('category')->paginate(10);
         $categories = Category::all();
 
         return Inertia::render('ItemList/Index', [
-            'items'      => $items,
+            'items' => $items,
             'categories' => $categories,
         ]);
     }
@@ -25,9 +25,9 @@ class ItemController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'        => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'quantity'    => 'required|integer|min:0',
+            'quantity' => 'required|integer|min:0',
         ]);
 
         $item = Item::create($validated);
@@ -39,15 +39,15 @@ class ItemController extends Controller
             ->withProperties(['attributes' => $validated, 'severity' => 'information'])
             ->log("Created a new item: {$item->name}");
 
-        return redirect()->route('items.index');
+        return redirect()->route('items.index')->with('success', "Item '{$item->name}' created successfully.");
     }
 
     public function update(Request $request, Item $item)
     {
         $validated = $request->validate([
-            'name'        => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'quantity'    => 'required|integer|min:0',
+            'quantity' => 'required|integer|min:0',
         ]);
 
         $old = $item->getOriginal();
@@ -64,7 +64,7 @@ class ItemController extends Controller
             ])
             ->log("Updated item: {$item->name}");
 
-        return redirect()->route('items.index');
+        return redirect()->route('items.index')->with('success', "Item '{$item->name}' updated successfully.");
     }
 
     public function destroy(Item $item)
@@ -79,6 +79,6 @@ class ItemController extends Controller
             ->withProperties(['severity' => 'warning'])
             ->log("Deleted item: {$itemName}");
 
-        return redirect()->route('items.index');
+        return redirect()->route('items.index')->with('success', "Item '{$itemName}' deleted successfully.");
     }
 }

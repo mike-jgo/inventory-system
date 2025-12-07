@@ -27,13 +27,15 @@ Route::middleware('web')->group(function () {
         Route::post('/items', [ItemController::class, 'store'])->name('items.store');
         Route::put('/items/{item}', [ItemController::class, 'update'])->name('items.update');
         Route::delete('/items/{item}', [ItemController::class, 'destroy'])->name('items.destroy');
-        Route::get('/users', [\App\Http\Controllers\UserController::class, 'index'])->name('users.index');
-        Route::post('/users', [\App\Http\Controllers\UserController::class, 'store'])->name('users.store');
-        Route::put('/users/{user}', [\App\Http\Controllers\UserController::class, 'update'])->name('users.update');
-        Route::delete('/users/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('users.destroy');
+        Route::middleware(['can:view users'])->group(function () {
+            Route::get('/users', [\App\Http\Controllers\UserController::class, 'index'])->name('users.index');
+            Route::post('/users', [\App\Http\Controllers\UserController::class, 'store'])->name('users.store');
+            Route::put('/users/{user}', [\App\Http\Controllers\UserController::class, 'update'])->name('users.update');
+            Route::delete('/users/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('users.destroy');
+        });
         Route::get('/activity-log', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-log.index');
         Route::post('/activities/{id}/remarks', [\App\Http\Controllers\ActivityLogController::class, 'saveRemarks'])
-        ->name('activities.remarks');
+            ->name('activities.remarks');
 
 
 

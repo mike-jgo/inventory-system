@@ -11,25 +11,31 @@ class UserController extends Controller
     public function index()
     {
         return Inertia::render('Users/Index', [
-            'users' => User::select('id', 'name', 'email', 'created_at')->get(),
+            'users' => User::with('roles')->select('id', 'name', 'email', 'created_at')->get(),
+            'roles' => \Spatie\Permission\Models\Role::all(),
         ]);
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|string|email|unique:users,email',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|unique:users,email',
             'password' => 'required|string|min:8',
+            'roles' => 'nullable', // Allow string or array
         ]);
 
-        User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
             'password' => bcrypt($data['password']),
         ]);
 
-        return redirect()->route('users.index')->with('success', 'User created successfully.');
+        if (!empty($data['roles'])) {
+            $user->assignRole($data['roles']);
+        }
+
+        return redirect()->route('users.index')->with('success', "User '{$user->name}' created successfully.");
     }
 
     public function update(Request $request, User $user)
@@ -38,6 +44,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => "required|string|email|unique:users,email,{$user->id}",
             'password' => 'nullable|string|min:8',
+            'roles' => 'nullable',
         ]);
 
         // 🧹 Remove empty or null password BEFORE updating
@@ -50,7 +57,11 @@ class UserController extends Controller
 
         $user->update($data);
 
-        return back()->with('success', 'User updated successfully.');
+        if (isset($data['roles'])) {
+            $user->syncRoles($data['roles']);
+        }
+
+        return back()->with('success', "User '{$user->name}' updated successfully.");
     }
 
 
@@ -58,6 +69,6 @@ class UserController extends Controller
     {
         $user->delete();
 
-        return redirect()->route('users.index')->with('success', 'User deleted successfully.');
+        return redirect()->route('users.index')->with('success', "User '{$user->name}' deleted successfully.");
     }
 }

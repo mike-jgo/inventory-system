@@ -23,26 +23,26 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255|unique:categories,name',
         ]);
 
-        Category::create($validated);
+        $category = Category::create($validated);
 
-        return redirect()->route('categories.index');
+        return redirect()->route('categories.index')->with('success', "Category '{$category->name}' created successfully.");
     }
 
     public function update(Request $request, Category $category)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name,'.$category->id,
+            'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
         ]);
 
         $category->update($validated);
 
-        return redirect()->route('categories.index');
+        return redirect()->route('categories.index')->with('success', "Category '{$category->name}' updated successfully.");
     }
 
     public function destroy(Category $category)
     {
         $category->delete();
 
-        return redirect()->route('categories.index');
+        return redirect()->route('categories.index')->with('success', "Category '{$category->name}' deleted successfully.");
     }
 }

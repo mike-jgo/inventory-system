@@ -24,16 +24,16 @@ Logs actions done in Item List Page containing date of action, user, item name, 
 - [x] Register Account
 - [x] Change Password
 - [ ] Forget Password
+- [x] Create Roles
+- [x] Create Permissions
+- [x] Create Super Admin
+- [x] Create User
 
 ## General Tasks
 
 - [x] Navbar
 - [ ] Flash Message
 - [x] Fix pagination on datatable component (Paginate doesn't work in controller as there are new page variables that are not yet in datatable)
-- [ ] Create Roles
-- [ ] Create Permissions
-- [ ] Create Super Admin
-- [ ] Create User
 
 ## Categories Page
 

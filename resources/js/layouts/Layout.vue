@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Navbar from '@/components/Navbar.vue';
+import FlashMessage from '@/components/FlashMessage.vue';
 
 defineProps<{
 	title?: string;
@@ -8,6 +9,7 @@ defineProps<{
 
 <template>
 	<div class="min-h-screen flex flex-col bg-gray-100">
+		<FlashMessage />
 		<!-- Navbar -->
 		<Navbar />
 

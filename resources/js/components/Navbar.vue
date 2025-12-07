@@ -21,7 +21,7 @@ const links = computed(() => {
 		{ name: 'Categories', href: route('categories.index') },
 		{ name: 'Activity Log', href: route('activity-log.index') }
 	];
-	if (user.value) {
+	if (user.value && user.value.can?.view_users) {
 		base.push({ name: 'Users', href: route('users.index') });
 	}
 	return base;

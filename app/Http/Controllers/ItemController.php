@@ -28,16 +28,10 @@ class ItemController extends Controller
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'quantity' => 'required|integer|min:0',
+            'price' => 'required|numeric|min:0',
         ]);
 
         $item = Item::create($validated);
-
-        //Log creation
-        activity()
-            ->causedBy(Auth::user())
-            ->performedOn($item)
-            ->withProperties(['attributes' => $validated, 'severity' => 'information'])
-            ->log("Created a new item: {$item->name}");
 
         return redirect()->route('items.index')->with('success', "Item '{$item->name}' created successfully.");
     }
@@ -48,21 +42,10 @@ class ItemController extends Controller
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'quantity' => 'required|integer|min:0',
+            'price' => 'required|numeric|min:0',
         ]);
 
-        $old = $item->getOriginal();
         $item->update($validated);
-
-        //Log update
-        activity()
-            ->causedBy(Auth::user())
-            ->performedOn($item)
-            ->withProperties([
-                'old' => $old,
-                'new' => $validated,
-                'severity' => 'information',
-            ])
-            ->log("Updated item: {$item->name}");
 
         return redirect()->route('items.index')->with('success', "Item '{$item->name}' updated successfully.");
     }
@@ -71,13 +54,6 @@ class ItemController extends Controller
     {
         $itemName = $item->name;
         $item->delete();
-
-        //Log deletion
-        activity()
-            ->causedBy(Auth::user())
-            ->performedOn($item)
-            ->withProperties(['severity' => 'warning'])
-            ->log("Deleted item: {$itemName}");
 
         return redirect()->route('items.index')->with('success', "Item '{$itemName}' deleted successfully.");
     }

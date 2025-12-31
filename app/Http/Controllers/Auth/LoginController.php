@@ -12,7 +12,7 @@ class LoginController extends Controller
     public function index()
     {
         if (Auth::check()) {
-            return redirect()->route('items.index');
+            return redirect()->route('dashboard');
         }
 
         return Inertia::render('Auth/Login');
@@ -22,7 +22,7 @@ class LoginController extends Controller
     {
         // Validate login input
         $credentials = $request->validate([
-            'email'    => ['required', 'email'],
+            'email' => ['required', 'email'],
             'password' => ['required', 'string'],
         ]);
 
@@ -31,7 +31,7 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             // Redirect to dashboard or home
-            return redirect()->intended(route('items.index'));
+            return redirect()->intended(route('dashboard'));
         }
 
         // Invalid credentials

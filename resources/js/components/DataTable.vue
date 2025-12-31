@@ -13,12 +13,13 @@ const props = defineProps<{
 	};
 }>();
 
-const emit = defineEmits(['edit', 'delete', 'view', 'paginate']);
+const emit = defineEmits(['edit', 'delete', 'view', 'paginate', 'row-click']);
 
 // Detect which listeners exist
 const hasEdit = computed(() => !!emit && !!getCurrentInstance()?.vnode.props?.onEdit);
 const hasDelete = computed(() => !!emit && !!getCurrentInstance()?.vnode.props?.onDelete);
 const hasView = computed(() => !!emit && !!getCurrentInstance()?.vnode.props?.onView);
+const hasRowClick = computed(() => !!emit && !!getCurrentInstance()?.vnode.props?.onRowClick);
 
 const hasPagination = computed(() => !!props.pagination && props.pagination.last_page > 1);
 </script>
@@ -36,7 +37,7 @@ const hasPagination = computed(() => !!props.pagination && props.pagination.last
 						{{ col.label }}
 					</th>
 					<th
-						v-if="hasEdit || hasDelete || hasView"
+						v-if="hasEdit || hasDelete || hasView || $slots.actions"
 						class="px-6 py-3 text-left text-sm font-medium"
 					>
 						Actions
@@ -49,23 +50,29 @@ const hasPagination = computed(() => !!props.pagination && props.pagination.last
 					v-for="row in props.rows"
 					:key="row.id"
 					class="hover:bg-gray-50 text-gray-900"
+					:class="{ 'cursor-pointer': hasRowClick }"
+					@click="hasRowClick ? emit('row-click', row) : null"
 				>
 					<td
 						v-for="col in props.columns"
 						:key="col.key"
 						class="px-6 py-4 text-sm"
 					>
-						{{
-							col.key.includes('.')
-								? col.key.split('.').reduce((obj, key) => obj?.[key], row)
-								: row[col.key]
-						}}
+						<slot :name="`cell-${col.key}`" :row="row" :value="col.key.includes('.') ? col.key.split('.').reduce((obj, key) => obj?.[key], row) : row[col.key]">
+							{{
+								col.key.includes('.')
+									? col.key.split('.').reduce((obj, key) => obj?.[key], row)
+									: row[col.key]
+							}}
+						</slot>
 					</td>
 
 					<td
-						v-if="hasEdit || hasDelete || hasView"
+						v-if="hasEdit || hasDelete || hasView || $slots.actions"
 						class="px-6 py-4 text-sm space-x-2"
 					>
+                        <slot name="actions" :row="row"></slot>
+                        
 						<button
 							v-if="hasEdit"
 							class="px-3 py-1 rounded bg-blue-500 hover:bg-blue-600 text-white text-sm"

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import Modal from '@/components/Modal.vue';
 
 const props = defineProps<{
 	resourceName: string;
@@ -27,8 +28,8 @@ const saveRemarks = () => {
 </script>
 
 <template>
-	<div class="bg-black/25 fixed flex items-center justify-center inset-0 z-50">
-		<div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg max-h-[85vh] overflow-y-auto">
+	<Modal :show="true" max-width="max-w-lg" @close="$emit('close')">
+		<div class="p-6 max-h-[85vh] overflow-y-auto">
 			<!-- Modal Header -->
 			<h2 class="text-xl font-semibold mb-4">{{ resourceName }}</h2>
 
@@ -46,27 +47,47 @@ const saveRemarks = () => {
 				</p>
 			</div>
 
-			<!-- Update Comparison Table -->
+			<!-- Changes Table -->
 			<div
-				v-if="updateFields"
+				v-if="model?.properties && (model.properties.attributes || model.properties.old)"
 				class="mt-2"
 			>
-				<h3 class="text-md font-semibold text-gray-800 mb-2">Update Details</h3>
+				<h3 class="text-md font-semibold text-gray-800 mb-2">
+                    {{ model.description === 'created' ? 'Created Attributes' : (model.description === 'deleted' ? 'Deleted Attributes' : 'Changes') }}
+                </h3>
 				<table class="w-full text-sm border border-gray-200 rounded">
 					<thead>
 						<tr class="bg-gray-100 text-left">
 							<th class="p-2">Field</th>
-							<th class="p-2">Old</th>
-							<th class="p-2">New</th>
+							<th class="p-2" v-if="model.description !== 'created'">Old</th>
+							<th class="p-2" v-if="model.description !== 'deleted'">New</th>
 						</tr>
 					</thead>
 					<tbody>
+                        <!-- For Created: Show attributes as New -->
+                        <template v-if="model.description === 'created' && model.properties.attributes">
+                             <tr v-for="(val, key) in model.properties.attributes" :key="key">
+                                <td class="p-2 font-medium capitalize">{{ String(key).replace('_', ' ') }}</td>
+                                <td class="p-2 text-green-700 font-semibold">{{ val }}</td>
+                            </tr>
+                        </template>
+
+                        <!-- For Deleted: Show old as Old -->
+                        <template v-else-if="model.description === 'deleted' && model.properties.old">
+                             <tr v-for="(val, key) in model.properties.old" :key="key">
+                                <td class="p-2 font-medium capitalize">{{ String(key).replace('_', ' ') }}</td>
+                                <td class="p-2 text-red-700 font-semibold">{{ val }}</td>
+                            </tr>
+                        </template>
+
+                        <!-- For Updated: Show Diff -->
 						<tr
-							v-for="f in updateFields"
+							v-else-if="updateFields"
+                            v-for="f in updateFields"
 							:key="f.field"
 							:class="{ 'bg-green-50': f.changed }"
 						>
-							<td class="p-2 font-medium">{{ f.field }}</td>
+							<td class="p-2 font-medium capitalize">{{ f.field.replace('_', ' ') }}</td>
 							<td class="p-2 text-gray-600">{{ f.oldValue ?? '—' }}</td>
 							<td class="p-2">
 								<span
@@ -115,5 +136,5 @@ const saveRemarks = () => {
 				</button>
 			</div>
 		</div>
-	</div>
+	</Modal>
 </template>

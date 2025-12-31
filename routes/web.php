@@ -3,6 +3,8 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ItemController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -10,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('web')->group(function () {
     Route::get('/', function () {
         if (Auth::check()) {
-            return redirect()->route('items.index');
+            return redirect()->route('dashboard');
         }
 
         return redirect()->route('login');
@@ -23,6 +25,7 @@ Route::middleware('web')->group(function () {
     });
     Route::middleware('auth')->group(function () {
         Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/items', [ItemController::class, 'index'])->name('items.index');
         Route::post('/items', [ItemController::class, 'store'])->name('items.store');
         Route::put('/items/{item}', [ItemController::class, 'update'])->name('items.update');
@@ -41,5 +44,12 @@ Route::middleware('web')->group(function () {
 
         Route::resource('categories', CategoryController::class)
             ->except(['show', 'create', 'edit']);
+
+        // Inventory Management (Superadmin only - authorization checked in controller)
+        Route::resource('inventory', InventoryController::class)
+            ->except(['show', 'create', 'edit']);
+
+        Route::put('/orders/{order}/complete', [\App\Http\Controllers\OrderController::class, 'complete'])->name('orders.complete');
+        Route::resource('orders', \App\Http\Controllers\OrderController::class);
     });
 });

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import Modal from '@/components/Modal.vue';
 
 const props = defineProps<{
 	resourceName: string;
@@ -21,8 +22,8 @@ const confirmDelete = () => {
 </script>
 
 <template>
-	<div class="bg-black/25 fixed inset-0 flex items-center justify-center z-50">
-		<div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+	<Modal :show="true" max-width="max-w-sm" @close="$emit('close')">
+		<div class="p-6">
 			<h2 class="text-lg font-semibold text-gray-800">Confirm Deletion</h2>
 			<p class="mt-2 text-gray-600">
 				Are you sure you want to delete this {{ resourceName.toLowerCase() }}:
@@ -48,5 +49,5 @@ const confirmDelete = () => {
 				</button>
 			</div>
 		</div>
-	</div>
+	</Modal>
 </template>

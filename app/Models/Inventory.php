@@ -7,23 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
-class Item extends Model
+class Inventory extends Model
 {
     use HasFactory;
     use LogsActivity;
 
     // Allow mass assignment
-    protected $fillable = ['name', 'category_id', 'quantity', 'price'];
-
-    public function orderItems()
-    {
-        return $this->hasMany(OrderItem::class);
-    }
-
-    public function category()
-    {
-        return $this->belongsTo(Category::class);
-    }
+    protected $fillable = ['name', 'supplier', 'quantity', 'cost_per_unit', 'reorder_level'];
 
     public function getActivitylogOptions(): LogOptions
     {

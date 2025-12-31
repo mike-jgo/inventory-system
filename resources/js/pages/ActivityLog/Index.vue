@@ -5,6 +5,7 @@ import { route } from 'ziggy-js';
 import Layout from '@/layouts/Layout.vue';
 import DataTable from '@/components/DataTable.vue';
 import ViewDetailsModal from '@/components/ViewDetailsModal.vue';
+import SearchFilter from '@/components/SearchFilter.vue';
 
 defineOptions({ layout: Layout });
 
@@ -14,6 +15,8 @@ const props = defineProps<{
 			id: number;
 			description: string;
 			subject_type: string | null;
+            subject_id: number | null;
+            subject?: { id: number; name?: string } | null;
 			causer?: { id: number; name?: string } | null;
 			created_at: string;
 			properties?: Record<string, any>;
@@ -25,22 +28,52 @@ const props = defineProps<{
 		total: number;
 		links: { url: string | null; label: string; active: boolean }[];
 	};
+	filters?: Record<string, any>;
+	filterOptions?: {
+		entities: string[];
+		actions: string[];
+	};
 }>();
 
 const columns = [
 	{ key: 'id', label: 'ID' },
 	{ key: 'causer.name', label: 'User' },
-	{ key: 'description', label: 'Action' },
+	{ key: 'display_description', label: 'Action' },
 	{ key: 'subject_type', label: 'Entity' },
 	{ key: 'created_at', label: 'Timestamp' }
 ];
 
-// ✅ Clean up the model name before displaying
 const formattedActivities = computed(() =>
-	props.activities.data.map((a) => ({
-		...a,
-		subject_type: a.subject_type?.replace('App\\Models\\', '') ?? a.subject_type
-	}))
+    props.activities.data.map((a) => {
+        const cleanedSubjectInfo = a.subject_type?.replace('App\\Models\\', '') ?? a.subject_type;
+        
+        let display_description = a.description;
+
+        if (['created', 'updated', 'deleted', 'restored'].includes(a.description)) {
+             const capitalizedDescription = a.description.charAt(0).toUpperCase() + a.description.slice(1);
+             
+             let subjectIdentifier = `#${a.subject_id ?? ''}`;
+
+             // Specific logic for Items to show Name
+             if (cleanedSubjectInfo === 'Item') {
+                if (a.subject && a.subject.name) {
+                    subjectIdentifier = `"${a.subject.name}"`;
+                } else if (a.properties?.attributes?.name) {
+                    subjectIdentifier = `"${a.properties.attributes.name}"`;
+                } else if (a.properties?.old?.name) { // For deleted items
+                    subjectIdentifier = `"${a.properties.old.name}"`;
+                }
+             }
+
+             display_description = `${capitalizedDescription} ${cleanedSubjectInfo ?? ''} ${subjectIdentifier}`.trim();
+        }
+
+        return {
+            ...a,
+            subject_type: cleanedSubjectInfo,
+            display_description: display_description
+        };
+    })
 );
 
 const showDetails = ref(false);
@@ -53,13 +86,13 @@ const openDetails = (row: any) => {
 
 const hasUpdateDetails = computed(() => {
 	const p = selectedActivity.value?.properties;
-	return p && p.old && p.new;
+	return p && p.old && p.attributes;
 });
 
 const getChangedFields = computed(() => {
 	if (!hasUpdateDetails.value) return [];
 	const oldData = selectedActivity.value.properties.old;
-	const newData = selectedActivity.value.properties.new;
+	const newData = selectedActivity.value.properties.attributes;
 	return Object.keys(newData).map((key) => ({
 		field: key,
 		oldValue: oldData[key],
@@ -91,6 +124,55 @@ const saveRemarks = (remarks: string) => {
 		}
 	);
 };
+
+const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.getFullYear() + '-' +
+        String(date.getMonth() + 1).padStart(2, '0') + '-' +
+        String(date.getDate()).padStart(2, '0') + ' ' +
+        String(date.getHours()).padStart(2, '0') + ':' +
+        String(date.getMinutes()).padStart(2, '0') + ':' +
+        String(date.getSeconds()).padStart(2, '0');
+};
+
+// Filter configuration
+const filterConfigs = computed(() => [
+	{
+		key: 'action',
+		label: 'Action Type',
+		type: 'select' as const,
+		options: props.filterOptions?.actions.map(a => ({
+			value: a,
+			label: a.charAt(0).toUpperCase() + a.slice(1)
+		})) || []
+	},
+	{
+		key: 'entity',
+		label: 'Entity Type',
+		type: 'select' as const,
+		options: props.filterOptions?.entities.map(e => ({
+			value: e,
+			label: e
+		})) || []
+	},
+	{
+		key: 'date_from',
+		label: 'From Date',
+		type: 'date' as const
+	},
+	{
+		key: 'date_to',
+		label: 'To Date',
+		type: 'date' as const
+	}
+]);
+
+const handleFilterUpdate = (filters: Record<string, any>) => {
+	router.get(route('activity-log.index'), filters, {
+		preserveScroll: true,
+		preserveState: true
+	});
+};
 </script>
 
 <template>
@@ -103,14 +185,26 @@ const saveRemarks = (remarks: string) => {
 
 		<p class="mt-4 text-gray-700">A complete record of user activities and system events.</p>
 
+		<!-- Search and Filters -->
+		<SearchFilter
+			:filters="filterConfigs"
+			:current-filters="filters"
+			search-placeholder="Search by description, user, or ID..."
+			@update:filters="handleFilterUpdate"
+			class="mt-6"
+		/>
+
 		<DataTable
 			:columns="columns"
 			:rows="formattedActivities"
 			:pagination="activities"
 			@paginate="handlePaginate"
 			@view="openDetails"
-			class="mt-6"
-		/>
+		>
+            <template #cell-created_at="{ value }">
+                {{ formatDate(value) }}
+            </template>
+        </DataTable>
 
 		<!-- Details Modal -->
 		<ViewDetailsModal

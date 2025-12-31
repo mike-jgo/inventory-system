@@ -217,7 +217,7 @@ The application uses a custom component library built with:
 
 ### Database Configuration
 
-The application supports SQLite (default), MySQL, and PostgreSQL. Update the database section in `.env` to switch databases.
+The application supports SQLite, MySQL (default), and PostgreSQL. Update the database section in `.env` to switch databases.
 
 ### Key Steps:
 

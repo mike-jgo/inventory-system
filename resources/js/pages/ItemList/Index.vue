@@ -18,6 +18,7 @@ defineProps<{
 			category_id: number | null;
 			category?: { id: number; name: string } | null;
 			quantity: number;
+			price: number;
 		}[];
 		current_page: number;
 		last_page: number;
@@ -38,7 +39,8 @@ const itemToDelete = ref<any | null>(null);
 const itemColumns = [
 	{ key: 'name', label: 'Name' },
 	{ key: 'category.name', label: 'Category' },
-	{ key: 'quantity', label: 'Quantity' }
+	{ key: 'quantity', label: 'Quantity' },
+	{ key: 'price', label: 'Price' }
 ];
 
 const openEditModal = (item: any) => {
@@ -46,7 +48,8 @@ const openEditModal = (item: any) => {
 		id: item.id,
 		name: item.name,
 		category_id: item.category_id,
-		quantity: item.quantity
+		quantity: item.quantity,
+		price: item.price
 	};
 	showEdit.value = true;
 };
@@ -84,7 +87,11 @@ const handlePaginate = (url: string | null) => {
 			@edit="openEditModal"
 			@delete="openDeleteModal"
 			@paginate="handlePaginate"
-		/>
+		>
+			<template #cell-price="{ value }">
+				{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(value) }}
+			</template>
+		</DataTable>
 
 		<!-- Add Modal -->
 		<FormModal
@@ -100,7 +107,8 @@ const handlePaginate = (url: string | null) => {
 					type: 'select',
 					options: categories.map((c) => ({ value: c.id, label: c.name }))
 				},
-				{ key: 'quantity', label: 'Quantity', type: 'number' }
+				{ key: 'quantity', label: 'Quantity', type: 'number' },
+				{ key: 'price', label: 'Price', type: 'number', step: '0.01' }
 			]"
 			@close="showAdd = false"
 		/>
@@ -120,7 +128,8 @@ const handlePaginate = (url: string | null) => {
 					type: 'select',
 					options: categories.map((c) => ({ value: c.id, label: c.name }))
 				},
-				{ key: 'quantity', label: 'Quantity', type: 'number' }
+				{ key: 'quantity', label: 'Quantity', type: 'number' },
+				{ key: 'price', label: 'Price', type: 'number', step: '0.01' }
 			]"
 			@close="showEdit = false"
 		/>

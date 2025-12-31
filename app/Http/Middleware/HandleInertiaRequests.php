@@ -47,6 +47,7 @@ class HandleInertiaRequests extends Middleware
                     'roles' => $request->user()->getRoleNames(),
                     'can' => [
                         'view_users' => $request->user()->can('view users'),
+                        'view_inventory' => $request->user()->hasRole('Super Admin'),
                     ]
                 ]) : null,
             ],

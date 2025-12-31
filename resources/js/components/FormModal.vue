@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
 import { watch } from 'vue';
+import Modal from '@/components/Modal.vue';
 
 const props = defineProps<{
 	resourceName: string; // e.g. "Item" or "Category"
@@ -11,6 +12,7 @@ const props = defineProps<{
 		key: string;
 		label: string;
 		type: string;
+		step?: string;
 		options?: { value: any; label: string }[];
 	}[];
 	model?: Record<string, any> | null; // existing values when editing
@@ -59,8 +61,8 @@ const submit = () => {
 </script>
 
 <template>
-	<div class="bg-black/25 fixed flex items-center justify-center inset-0 z-50">
-		<div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+	<Modal :show="true" max-width="max-w-md" @close="$emit('close')">
+		<div class="p-6">
 			<h2 class="text-xl font-semibold mb-4">
 				{{ mode === 'add' ? `Add ${resourceName}` : `Edit ${resourceName}` }}
 			</h2>
@@ -99,6 +101,7 @@ const submit = () => {
 						<input
 							v-model="form[field.key]"
 							:type="field.type"
+							:step="field.step"
 							:placeholder="`Enter ${field.label}`"
 							class="text-gray-700 mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm"
 							:required="!(field.key === 'password' && mode === 'edit')"
@@ -139,5 +142,5 @@ const submit = () => {
 				</div>
 			</form>
 		</div>
-	</div>
+	</Modal>
 </template>

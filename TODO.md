@@ -32,7 +32,7 @@ Logs actions done in Item List Page containing date of action, user, item name, 
 ## General Tasks
 
 - [x] Navbar
-- [ ] Flash Message
+- [x] Flash Message
 - [x] Fix pagination on datatable component (Paginate doesn't work in controller as there are new page variables that are not yet in datatable)
 
 ## Categories Page

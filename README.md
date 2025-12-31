@@ -9,7 +9,7 @@ A modern, full-featured inventory management system built with **Laravel 12**, *
 - **Item Management** - Create, read, update, and delete inventory items with categories and pricing
 - **Inventory Tracking** - Real-time inventory levels with automated quantity updates
 - **Point of Sale (POS)** - Complete order management system with order creation and tracking
-- **Activity Log** - Comprehensive audit trail of all inventory actions with user tracking
+- **Activity Log** - Audit trail of all inventory actions with user tracking
 - **Category Management** - Organize items with customizable categories
 - **User Management** - Multi-user support with role-based access control
 
@@ -18,9 +18,9 @@ A modern, full-featured inventory management system built with **Laravel 12**, *
 - **Role-Based Permissions** - Spatie Laravel Permission integration with superadmin and user roles
 - **Order Management** - Complete order lifecycle with cancellation options (wastage vs. restocking)
 - **Dashboard Analytics** - Recent orders and inventory insights
-- **Activity Remarks** - Add notes and comments to activity log entries
-- **Flash Messages** - User-friendly notifications for all CRUD operations
-- **Search & Filter** - Powerful search and filtering capabilities across all modules
+- **Activity Remarks** - Notes and comments to activity log entries
+- **Flash Messages** - Notifications for all CRUD operations
+- **Search & Filter**
 
 ## Prerequisites
 
@@ -208,10 +208,9 @@ inventory-system/
 
 The application uses a custom component library built with:
 
-- **Reka UI** - Accessible, unstyled components
-- **Class Variance Authority** - Type-safe component variants
-- **TailwindCSS** - Utility-first styling
-- **Lucide Icons** - Beautiful, consistent icons
+- **Reka UI**
+- **Class Variance Authority**
+- **TailwindCSS** 
 
 ## Configuration
 

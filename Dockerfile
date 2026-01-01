@@ -11,7 +11,9 @@ RUN apk add --no-cache \
     icu-dev \
     oniguruma-dev \
     postgresql-dev \
-    nginx
+    nginx \
+    nodejs \
+    npm
 
 # Install PHP extensions required by Laravel 12
 RUN docker-php-ext-install pdo pdo_pgsql mbstring zip exif pcntl bcmath gd intl
@@ -27,6 +29,9 @@ COPY . .
 
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader
+
+# Install and build frontend assets
+RUN npm ci && npm run build
 
 # Laravel setup
 RUN php artisan storage:link && \

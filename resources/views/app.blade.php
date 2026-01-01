@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}"  @class(['dark' => ($appearance ?? 'system') == 'dark'])>
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}
         <script>
@@ -27,6 +27,18 @@
 
             html.dark {
                 background-color: oklch(0.145 0 0);
+            }
+
+            /* Prevent horizontal overflow on mobile */
+            html, body {
+                overflow-x: hidden;
+                width: 100%;
+                position: relative;
+            }
+
+            /* Smooth scrolling for mobile */
+            * {
+                -webkit-overflow-scrolling: touch;
             }
         </style>
 

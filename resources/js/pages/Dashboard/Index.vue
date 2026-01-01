@@ -101,53 +101,53 @@ const getStatusColor = (status: string) => {
 <template>
 	<Head title="Dashboard" />
 
-	<div class="p-8">
+	<div class="p-4 sm:p-6 md:p-8">
 		<!-- Welcome Section -->
-		<div class="mb-8">
-			<h1 class="text-4xl font-bold text-gray-900 mb-2">
+		<div class="mb-6 sm:mb-8">
+			<h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
 				Welcome back, {{ auth?.name }}!
 			</h1>
-			<p class="text-gray-600 text-lg">Here's what's happening with your inventory today.</p>
+			<p class="text-gray-600 text-base sm:text-lg">Here's what's happening with your inventory today.</p>
 		</div>
 
 		<!-- Statistics Cards -->
-		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
 			<Link
 				v-for="stat in statCards"
 				:key="stat.title"
 				:href="stat.link"
-				class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+				class="bg-white rounded-xl shadow-md p-5 sm:p-6 hover:shadow-lg transition-shadow duration-200 cursor-pointer touch-manipulation"
 			>
 				<div class="flex items-center justify-between">
 					<div>
 						<p class="text-gray-600 text-sm font-medium mb-1">{{ stat.title }}</p>
-						<p class="text-3xl font-bold text-gray-900">{{ stat.value }}</p>
+						<p class="text-2xl sm:text-3xl font-bold text-gray-900">{{ stat.value }}</p>
 					</div>
 				</div>
 			</Link>
 		</div>
 
 		<!-- Quick Actions -->
-		<div class="mb-8">
-			<h2 class="text-2xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-			<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+		<div class="mb-6 sm:mb-8">
+			<h2 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+			<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
 				<Link
 					v-for="action in quickActions"
 					:key="action.title"
 					:href="action.link"
 					:class="action.color"
-					class="text-white rounded-lg shadow-md p-6 transition-all duration-200 transform hover:scale-105"
+					class="text-white rounded-lg shadow-md p-5 sm:p-6 transition-all duration-200 transform hover:scale-105 touch-manipulation"
 				>
-					<h3 class="text-xl font-semibold mb-2">{{ action.title }}</h3>
+					<h3 class="text-lg sm:text-xl font-semibold mb-2">{{ action.title }}</h3>
 					<p class="text-white/90 text-sm">{{ action.description }}</p>
 				</Link>
 			</div>
 		</div>
 
 		<!-- Recent Orders -->
-		<div class="bg-white rounded-xl shadow-md p-6">
-			<div class="flex justify-between items-center mb-4">
-				<h2 class="text-2xl font-semibold text-gray-900">Recent Orders</h2>
+		<div class="bg-white rounded-xl shadow-md p-4 sm:p-6">
+			<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+				<h2 class="text-xl sm:text-2xl font-semibold text-gray-900">Recent Orders</h2>
 				<Link
 					:href="route('orders.index')"
 					class="text-blue-600 hover:text-blue-700 font-medium text-sm"
@@ -161,16 +161,16 @@ const getStatusColor = (status: string) => {
 					v-for="order in recentOrders"
 					:key="order.id"
 					:href="route('orders.show', order.id)"
-					class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+					class="block p-3 sm:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors touch-manipulation"
 				>
-					<div class="flex justify-between items-start">
+					<div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
 						<div>
 							<p class="font-medium text-gray-900">Order #{{ order.id }}</p>
-							<p class="text-sm text-gray-600 mt-1">{{ formatDate(order.created_at) }}</p>
+							<p class="text-xs sm:text-sm text-gray-600 mt-1">{{ formatDate(order.created_at) }}</p>
 						</div>
 						<span
 							:class="getStatusColor(order.status)"
-							class="px-3 py-1 rounded-full text-xs font-medium capitalize"
+							class="px-3 py-1 rounded-full text-xs font-medium capitalize inline-block self-start"
 						>
 							{{ order.status }}
 						</span>

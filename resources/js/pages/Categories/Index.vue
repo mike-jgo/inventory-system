@@ -25,12 +25,12 @@ const categoryColumns = [{ key: 'name', label: 'Category Name' }];
 <template>
 	<Head title="Categories" />
 
-	<div class="p-8">
-		<div class="flex justify-between items-center">
-			<h1 class="text-3xl font-semibold text-gray-900">Categories</h1>
+	<div class="p-4 sm:p-6 md:p-8">
+		<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+			<h1 class="text-2xl sm:text-3xl font-semibold text-gray-900">Categories</h1>
 			<button
 				@click="showAdd = true"
-				class="px-4 py-2 rounded bg-blue-500 hover:bg-blue-600 text-white"
+				class="w-full sm:w-auto px-4 py-2 rounded bg-blue-500 hover:bg-blue-600 text-white touch-manipulation"
 			>
 				+ Add Category
 			</button>

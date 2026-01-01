@@ -36,11 +36,11 @@ watch(
 <template>
     <div
         v-if="show"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/25 transition-opacity"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/25 transition-opacity px-4"
         @click.self="close"
     >
         <div
-            class="w-full rounded-lg bg-white shadow-lg transition-all"
+            class="w-full rounded-lg bg-white shadow-lg transition-all max-h-[90vh] overflow-y-auto"
             :class="[maxWidth ?? 'max-w-xl']"
         >
             <slot />

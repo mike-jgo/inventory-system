@@ -1,0 +1,54 @@
+# Stage 1: Build Stage
+FROM php:8.4-fpm-alpine
+
+# Install system dependencies
+RUN apk add --no-cache \
+    bash \
+    curl \
+    libpng-dev \
+    libzip-dev \
+    zlib-dev \
+    icu-dev \
+    oniguruma-dev \
+    postgresql-dev \
+    nginx \
+    nodejs \
+    npm
+
+# Install PHP extensions required by Laravel 12
+RUN docker-php-ext-install pdo pdo_pgsql mbstring zip exif pcntl bcmath gd intl
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy application files
+COPY . .
+
+# Install dependencies
+RUN composer install --no-dev --optimize-autoloader
+
+# Install and build frontend assets
+RUN npm ci && npm run build
+
+# Laravel setup
+RUN php artisan storage:link && \
+    chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Setup Nginx
+COPY ./docker/nginx/nginx.conf /etc/nginx/http.d/default.conf
+
+# Configure PHP-FPM to log errors to stderr for Render
+RUN echo "catch_workers_output = yes" >> /usr/local/etc/php-fpm.d/docker.conf && \
+    echo "php_admin_flag[log_errors] = on" >> /usr/local/etc/php-fpm.d/docker.conf && \
+    echo "php_admin_value[error_log] = /dev/stderr" >> /usr/local/etc/php-fpm.d/docker.conf
+
+# Copy and setup entrypoint script
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+EXPOSE 80
+
+CMD ["/usr/local/bin/entrypoint.sh"]

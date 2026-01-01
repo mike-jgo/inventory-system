@@ -29,22 +29,13 @@ class RolePermissionSeeder extends Seeder
         // Super Admin gets all permissions
         $roleSuperAdmin->givePermissionTo(Permission::all());
 
-        // Create Super Admin User
+        // Create Super Admin User with credentials from environment
         $admin = User::firstOrCreate([
-            'email' => 'admin@example.com',
+            'email' => env('ADMIN_EMAIL', 'admin@inventory.local'),
         ], [
-            'name' => 'Super Admin',
-            'password' => bcrypt('password'),
+            'name' => env('ADMIN_NAME', 'System Administrator'),
+            'password' => bcrypt(env('ADMIN_PASSWORD', 'change-me-immediately')),
         ]);
         $admin->assignRole($roleSuperAdmin);
-
-        // Create Standard User
-        $user = User::firstOrCreate([
-            'email' => 'user@example.com',
-        ], [
-            'name' => 'Standard User',
-            'password' => bcrypt('password'),
-        ]);
-        $user->assignRole($roleUser);
     }
 }

@@ -11,13 +11,14 @@ const props = defineProps<{
 		causer?: { id: number; name?: string } | null;
 		created_at?: string;
 		properties?: Record<string, any>;
+		remarks?: string | null;
 	} | null;
 	updateFields?: { field: string; oldValue: any; newValue: any; changed: boolean }[] | null;
 }>();
 
 const emit = defineEmits(['close', 'saveRemarks']);
 
-const remarks = ref('');
+const remarks = ref(props.model?.remarks || '');
 
 // Emit remarks when saving
 const saveRemarks = () => {
@@ -109,7 +110,7 @@ const saveRemarks = () => {
 
 			<!-- Remarks Section -->
 			<div class="mt-6">
-				<h3 class="text-md font-semibold text-gray-800 mb-2">Add Remarks</h3>
+				<h3 class="text-md font-semibold text-gray-800 mb-2">Remarks</h3>
 				<textarea
 					v-model="remarks"
 					placeholder="Enter remarks here..."

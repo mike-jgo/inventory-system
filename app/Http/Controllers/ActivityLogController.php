@@ -28,9 +28,9 @@ class ActivityLogController extends Controller
             $query->where('description', $action);
         }
 
-        // Entity filter
+        // Entity filter - match by class basename to support any namespace
         if ($entity = $request->input('entity')) {
-            $query->where('subject_type', 'App\\Models\\' . $entity);
+            $query->whereRaw('subject_type LIKE ?', ['%\\' . $entity]);
         }
 
         // Date range filter
@@ -48,7 +48,7 @@ class ActivityLogController extends Controller
             ->distinct()
             ->whereNotNull('subject_type')
             ->pluck('subject_type')
-            ->map(fn($type) => str_replace('App\\Models\\', '', $type))
+            ->map(fn($type) => class_basename($type)) // Extract just the class name from any namespace
             ->sort()
             ->values();
 
@@ -82,8 +82,22 @@ class ActivityLogController extends Controller
         ]);
 
         $activity = Activity::findOrFail($id);
-        $activity->remarks = $validated['remarks'];
+        $oldRemarks = $activity->remarks;
+        $newRemarks = $validated['remarks'];
+
+        $activity->remarks = $newRemarks;
         $activity->save();
+
+        // Log the remarks change as an activity
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($activity)
+            ->withProperties([
+                'old' => ['remarks' => $oldRemarks],
+                'attributes' => ['remarks' => $newRemarks],
+                'activity_log_id' => $activity->id,
+            ])
+            ->log('Updated remarks on activity log');
 
         return back()->with('success', 'Remarks saved successfully.');
     }

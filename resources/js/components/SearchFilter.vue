@@ -85,26 +85,26 @@ const hasActiveFilters = () => {
 </script>
 
 <template>
-	<div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 mb-6">
-		<div class="flex flex-wrap gap-2 items-center">
+	<div class="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
+		<div class="flex flex-col sm:flex-row sm:flex-wrap gap-2 items-stretch sm:items-center">
 			<!-- Search Input -->
-			<div class="w-[300px]">
+			<div class="w-full sm:w-[300px]">
 				<input
 					v-model="searchQuery"
 					type="text"
 					:placeholder="searchPlaceholder || 'Search...'"
-					class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+					class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
 				/>
 			</div>
 
 			<!-- Dynamic Filters -->
 			<template v-for="filter in filters" :key="filter.key">
 				<!-- Select Filters -->
-				<div v-if="filter.type === 'select'" class="w-[160px]">
+				<div v-if="filter.type === 'select'" class="w-full sm:w-[160px]">
 					<select
 						v-model="selectedFilters[filter.key]"
 						@change="applyFilters"
-						class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+						class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
 					>
 						<option value="">{{ filter.label }}</option>
 						<option
@@ -118,13 +118,13 @@ const hasActiveFilters = () => {
 				</div>
 
 				<!-- Date Filters -->
-				<div v-else-if="filter.type === 'date'" class="w-[160px]">
+				<div v-else-if="filter.type === 'date'" class="w-full sm:w-[160px]">
 					<input
 						v-model="selectedFilters[filter.key]"
 						@change="applyFilters"
 						type="date"
 						:placeholder="filter.label"
-						class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+						class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
 					/>
 				</div>
 			</template>
@@ -133,7 +133,7 @@ const hasActiveFilters = () => {
 			<button
 				v-if="hasActiveFilters()"
 				@click="clearAllFilters"
-				class="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors whitespace-nowrap"
+				class="w-full sm:w-auto px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors whitespace-nowrap touch-manipulation"
 			>
 				Clear All
 			</button>

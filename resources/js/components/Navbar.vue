@@ -140,7 +140,7 @@ const isDropdownActive = (items: any[]) => {
 				</div>
 
 				<!-- Desktop Navigation -->
-				<div class="hidden sm:flex sm:space-x-2 items-center">
+				<div class="hidden md:flex md:space-x-2 items-center">
 					<!-- Dropdown Groups -->
 					<div
 						v-for="group in navGroups"
@@ -227,10 +227,10 @@ const isDropdownActive = (items: any[]) => {
 				</div>
 
 				<!-- Mobile Menu Button -->
-				<div class="flex sm:hidden items-center">
+				<div class="flex md:hidden items-center">
 					<button
 						@click="mobileMenuOpen = !mobileMenuOpen"
-						class="text-gray-700 hover:text-blue-600 focus:outline-none"
+						class="text-gray-700 hover:text-blue-600 focus:outline-none p-2 touch-manipulation"
 					>
 						<svg
 							class="h-6 w-6"
@@ -259,10 +259,17 @@ const isDropdownActive = (items: any[]) => {
 			</div>
 		</div>
 
+		<!-- Mobile Menu Background Overlay -->
+		<div
+			v-if="mobileMenuOpen"
+			class="fixed inset-0 bg-black/20 z-40 md:hidden"
+			@click="mobileMenuOpen = false"
+		></div>
+
 		<!-- Mobile Menu -->
 		<div
 			v-if="mobileMenuOpen"
-			class="sm:hidden px-4 pb-4 space-y-2 border-t"
+			class="md:hidden px-4 pb-4 pt-2 space-y-1 border-t bg-white relative z-50 max-h-[calc(100vh-64px)] overflow-y-auto"
 		>
 			<!-- Mobile Navigation Groups -->
 			<div
@@ -275,10 +282,10 @@ const isDropdownActive = (items: any[]) => {
 					v-if="group.isSingle"
 					:href="group.href"
 					@click="mobileMenuOpen = false"
-					class="block font-medium py-2 px-2 rounded"
+					class="block font-medium py-3 px-3 rounded touch-manipulation"
 					:class="[
 						isActive(group.href)
-							? 'text-blue-700 font-bold'
+							? 'text-blue-700 font-bold bg-blue-50'
 							: 'text-gray-700 hover:bg-gray-50'
 					]"
 				>
@@ -287,7 +294,7 @@ const isDropdownActive = (items: any[]) => {
 
 				<!-- Group with Items -->
 				<div v-else>
-					<div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 px-2">
+					<div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-3">
 						{{ group.name }}
 					</div>
 					<Link
@@ -295,12 +302,12 @@ const isDropdownActive = (items: any[]) => {
 						:key="item.name"
 						:href="item.href"
 						@click="mobileMenuOpen = false"
-						class="block font-medium py-2 px-4 rounded"
+						class="block font-medium py-3 px-5 rounded touch-manipulation"
 						:class="[
 							isActive(item.href)
-								? 'text-blue-700 font-bold'
+								? 'text-blue-700 font-bold bg-blue-50'
 								: 'text-gray-700 hover:bg-gray-50'
-						]"
+					]"
 					>
 						{{ item.name }}
 					</Link>
@@ -310,11 +317,11 @@ const isDropdownActive = (items: any[]) => {
 			<!-- Mobile Logout -->
 			<div
 				v-if="user"
-				class="pt-2 border-t"
+				class="pt-3 border-t mt-2"
 			>
 				<button
 					@click="logout"
-					class="w-full text-left px-2 py-2 text-gray-700 hover:bg-gray-100 rounded"
+					class="w-full text-left px-3 py-3 text-gray-700 hover:bg-gray-100 rounded font-medium touch-manipulation"
 				>
 					Logout
 				</button>

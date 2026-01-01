@@ -30,7 +30,7 @@ RUN composer install --no-dev --optimize-autoloader
 
 # Setup Nginx and permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/cache
-COPY ./docker/nginx.conf /etc/nginx/http.d/default.conf
+COPY ./docker/nginx/nginx.conf /etc/nginx/http.d/default.conf
 
 EXPOSE 80
 

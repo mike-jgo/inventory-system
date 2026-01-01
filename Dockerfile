@@ -40,6 +40,10 @@ RUN echo "catch_workers_output = yes" >> /usr/local/etc/php-fpm.d/docker.conf &&
     echo "php_admin_flag[log_errors] = on" >> /usr/local/etc/php-fpm.d/docker.conf && \
     echo "php_admin_value[error_log] = /dev/stderr" >> /usr/local/etc/php-fpm.d/docker.conf
 
+# Copy and setup entrypoint script
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 EXPOSE 80
 
-CMD ["sh", "-c", "nginx && php-fpm"]
+CMD ["/usr/local/bin/entrypoint.sh"]

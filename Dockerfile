@@ -36,6 +36,10 @@ RUN php artisan storage:link && \
 # Setup Nginx
 COPY ./docker/nginx/nginx.conf /etc/nginx/http.d/default.conf
 
+# Configure PHP-FPM to log to stderr for Render
+RUN echo "error_log = /dev/stderr" >> /usr/local/etc/php-fpm.d/docker.conf && \
+    echo "catch_workers_output = yes" >> /usr/local/etc/php-fpm.d/docker.conf
+
 EXPOSE 80
 
 CMD ["sh", "-c", "nginx && php-fpm"]

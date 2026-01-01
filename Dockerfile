@@ -1,19 +1,37 @@
-FROM serversideup/php:8.4-fpm-nginx
+# Stage 1: Build Stage
+FROM php:8.4-fpm-alpine
 
-# 1. Set environment variables
-ENV WEBROOT /var/www/html/public
-ENV APP_ENV production
-ENV APP_DEBUG false
-ENV LOG_CHANNEL stderr
+# Install system dependencies
+RUN apk add --no-cache \
+    bash \
+    curl \
+    libpng-dev \
+    libzip-dev \
+    zlib-dev \
+    icu-dev \
+    oniguruma-dev \
+    postgresql-dev \
+    nginx
 
-# Enable the automated script runner
-ENV RUN_SCRIPTS 1
+# Install PHP extensions required by Laravel 12
+RUN docker-php-ext-install pdo pdo_pgsql mbstring zip exif pcntl bcmath gd intl
 
-# 2. Copy your application files and set ownership to www-data
-COPY --chown=www-data:www-data . /var/www/html
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# 3. Move your deploy script to the location the image expects
-# We use 'mkdir -p' to ensure the directory exists before moving
-RUN mkdir -p /var/www/html/.docker && \
-    mv /var/www/html/scripts/00-laravel-deploy.sh /var/www/html/.docker/run.sh && \
-    chmod +x /var/www/html/.docker/run.sh
+# Set working directory
+WORKDIR /var/www
+
+# Copy application files
+COPY . .
+
+# Install dependencies
+RUN composer install --no-dev --optimize-autoloader
+
+# Setup Nginx and permissions
+RUN chown -R www-data:www-data /var/www/storage /var/www/cache
+COPY ./docker/nginx.conf /etc/nginx/http.d/default.conf
+
+EXPOSE 80
+
+CMD ["sh", "-c", "nginx && php-fpm"]

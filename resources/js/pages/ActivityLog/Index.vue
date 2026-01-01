@@ -207,12 +207,12 @@ const handleFilterUpdate = (filters: Record<string, any>) => {
 <template>
 	<Head title="Activity Log" />
 
-	<div class="p-8">
+	<div class="p-4 sm:p-6 md:p-8">
 		<div class="flex justify-between items-center">
-			<h1 class="text-3xl font-semibold text-gray-900">Activity Log</h1>
+			<h1 class="text-2xl sm:text-3xl font-semibold text-gray-900">Activity Log</h1>
 		</div>
 
-		<p class="mt-4 text-gray-700">A complete record of user activities and system events.</p>
+		<p class="mt-4 text-sm sm:text-base text-gray-700">A complete record of user activities and system events.</p>
 
 		<!-- Search and Filters -->
 		<SearchFilter

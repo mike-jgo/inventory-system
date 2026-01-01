@@ -114,13 +114,13 @@ const submitOrder = () => {
 <template>
     <Head title="New Order (POS)" />
 
-    <div class="h-[calc(100vh-64px)] flex flex-col md:flex-row bg-gray-100 overflow-hidden">
+    <div class="h-[calc(100vh-64px)] flex flex-col lg:flex-row bg-gray-100 overflow-hidden">
         <!-- Left Panel: Menu -->
-        <div class="flex-1 flex flex-col h-full overflow-hidden">
+        <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Header/Filters -->
-            <div class="bg-white p-4 shadow-sm z-10 flex flex-col space-y-4">
+            <div class="bg-white p-3 sm:p-4 shadow-sm z-10 flex flex-col space-y-3">
                 <div class="flex items-center">
-                    <Link href="/orders" class="text-gray-600 hover:text-gray-900 flex items-center text-sm font-medium">
+                    <Link href="/orders" class="text-gray-600 hover:text-gray-900 flex items-center text-sm font-medium touch-manipulation">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
@@ -131,16 +131,16 @@ const submitOrder = () => {
                     type="text" 
                     v-model="searchQuery" 
                     placeholder="Search items..." 
-                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 text-sm sm:text-base"
                 />
                 
-                <div class="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide">
+                <div class="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide -mx-3 px-3">
                     <button 
                         v-for="cat in categories" 
                         :key="cat.id"
                         @click="activeCategoryId = cat.id"
                         :class="[
-                            'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors',
+                            'px-3 sm:px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors touch-manipulation',
                             activeCategoryId === cat.id 
                                 ? 'bg-indigo-600 text-white' 
                                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -152,23 +152,23 @@ const submitOrder = () => {
             </div>
 
             <!-- Items Grid -->
-            <div class="flex-1 overflow-y-auto p-4">
-                <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div class="flex-1 overflow-y-auto p-3 sm:p-4">
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                     <button 
                         v-for="item in activeCategoryItems" 
                         :key="item.id"
                         @click="addToCart(item)"
                         :disabled="getRemainingStock(item) <= 0"
                         :class="[
-                            'rounded-lg shadow p-4 flex flex-col items-center justify-between transition-shadow h-32',
+                            'rounded-lg shadow p-3 sm:p-4 flex flex-col items-center justify-between transition-shadow h-28 sm:h-32 touch-manipulation',
                             getRemainingStock(item) <= 0 
                                 ? 'bg-gray-100 opacity-75 cursor-not-allowed grayscale' 
-                                : 'bg-white hover:shadow-md'
+                                : 'bg-white hover:shadow-md active:shadow-sm'
                         ]"
                     >
-                        <span class="font-semibold text-gray-900 text-center line-clamp-2">{{ item.name }}</span>
+                        <span class="font-semibold text-gray-900 text-center line-clamp-2 text-xs sm:text-sm">{{ item.name }}</span>
                         <div class="mt-2 text-center">
-                            <span class="block text-indigo-600 font-bold">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(item.price) }}</span>
+                            <span class="block text-indigo-600 font-bold text-sm sm:text-base">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(item.price) }}</span>
                             <span 
                                 :class="[
                                     'text-xs font-medium',
@@ -187,29 +187,29 @@ const submitOrder = () => {
         </div>
 
         <!-- Right Panel: Cart -->
-        <div class="w-full md:w-96 bg-white shadow-xl flex flex-col h-full border-l border-gray-200">
-            <div class="p-4 border-b border-gray-200 bg-gray-50">
-                <h2 class="text-xl font-bold text-gray-800">Current Order</h2>
+        <div class="w-full lg:w-96 bg-white shadow-xl flex flex-col border-l border-gray-200 max-h-[50vh] lg:max-h-full">
+            <div class="p-3 sm:p-4 border-b border-gray-200 bg-gray-50">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-800">Current Order</h2>
             </div>
 
             <!-- Cart Items -->
-            <div class="flex-1 overflow-y-auto p-4 space-y-3">
+            <div class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3">
                 <div v-if="cart.length === 0" class="text-center text-gray-400 py-10">
                     Cart is empty.
                 </div>
-                <div v-else v-for="(cartItem, index) in cart" :key="cartItem.item.id" class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
-                    <div class="flex-1">
-                        <h4 class="font-medium text-gray-900 line-clamp-1">{{ cartItem.item.name }}</h4>
-                        <p class="text-sm text-gray-500">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(cartItem.item.price) }} x {{ cartItem.quantity }}</p>
+                <div v-else v-for="(cartItem, index) in cart" :key="cartItem.item.id" class="flex justify-between items-center bg-gray-50 p-2 sm:p-3 rounded-lg">
+                    <div class="flex-1 min-w-0 pr-2">
+                        <h4 class="font-medium text-gray-900 line-clamp-1 text-xs sm:text-sm">{{ cartItem.item.name }}</h4>
+                        <p class="text-xs sm:text-sm text-gray-500">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency:'PHP' }).format(cartItem.item.price) }} x {{ cartItem.quantity }}</p>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <button @click="updateQuantity(index, -1)" class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 flex items-center justify-center">-</button>
-                        <span class="font-bold w-4 text-center">{{ cartItem.quantity }}</span>
+                        <button @click="updateQuantity(index, -1)" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 flex items-center justify-center text-sm touch-manipulation">-</button>
+                        <span class="font-bold w-4 text-center text-xs sm:text-sm">{{ cartItem.quantity }}</span>
                         <button 
                             @click="updateQuantity(index, 1)" 
                             :disabled="cartItem.quantity >= cartItem.item.quantity"
                             :class="[
-                                'w-8 h-8 rounded-full flex items-center justify-center transition-colors',
+                                'w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-colors text-sm touch-manipulation',
                                 cartItem.quantity >= cartItem.item.quantity 
                                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
                                     : 'bg-indigo-100 text-indigo-600 hover:bg-indigo-200'
@@ -222,28 +222,28 @@ const submitOrder = () => {
             </div>
 
             <!-- Footer: Totals & Checkout -->
-            <div class="p-4 border-t border-gray-200 bg-gray-50 space-y-4">
-                <div class="flex justify-between text-lg font-bold">
+            <div class="p-3 sm:p-4 border-t border-gray-200 bg-gray-50 space-y-3 sm:space-y-4">
+                <div class="flex justify-between text-base sm:text-lg font-bold">
                     <span>Total</span>
                     <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(cartTotal) }}</span>
                 </div>
 
                 <div class="space-y-3">
                     <div>
-                         <label class="block text-sm font-medium text-gray-700">Order Type</label>
-                         <select v-model="form.type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                         <label class="block text-xs sm:text-sm font-medium text-gray-700">Order Type</label>
+                         <select v-model="form.type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
                              <option value="dine_in">Dine In</option>
                              <option value="takeout">Takeout</option>
                              <option value="online">Online</option>
                          </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Customer Name (Optional)</label>
-                        <input type="text" v-model="form.customer_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Guest">
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700">Customer Name (Optional)</label>
+                        <input type="text" v-model="form.customer_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm" placeholder="Guest">
                     </div>
                     <div>
-                         <label class="block text-sm font-medium text-gray-700">Status</label>
-                         <select v-model="form.status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                         <label class="block text-xs sm:text-sm font-medium text-gray-700">Status</label>
+                         <select v-model="form.status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
                              <option value="pending">Pending</option>
                              <option value="completed">Completed</option>
                          </select>
@@ -253,7 +253,7 @@ const submitOrder = () => {
                 <button 
                     @click="submitOrder"
                     :disabled="cart.length === 0 || form.processing"
-                    class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow transition-colors disabled:opacity-50"
+                    class="w-full py-2.5 sm:py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow transition-colors disabled:opacity-50 touch-manipulation text-sm sm:text-base"
                 >
                     {{ form.processing ? 'Processing...' : 'Complete Order' }}
                 </button>

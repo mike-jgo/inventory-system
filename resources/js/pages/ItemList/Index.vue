@@ -67,18 +67,18 @@ const handlePaginate = (url: string | null) => {
 <template>
 	<Head title="Item List" />
 
-	<div class="p-8">
-		<div class="flex justify-between items-center">
-			<h1 class="text-3xl font-semibold text-gray-900">Item List</h1>
+	<div class="p-4 sm:p-6 md:p-8">
+		<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+			<h1 class="text-2xl sm:text-3xl font-semibold text-gray-900">Item List</h1>
 			<button
 				@click="showAdd = true"
-				class="px-4 py-2 rounded bg-blue-500 hover:bg-blue-600 text-white"
+				class="w-full sm:w-auto px-4 py-2 rounded bg-blue-500 hover:bg-blue-600 text-white touch-manipulation"
 			>
 				+ Add Item
 			</button>
 		</div>
 
-		<p class="mt-4 text-gray-700">List of items currently in stock.</p>
+		<p class="mt-4 text-sm sm:text-base text-gray-700">List of items currently in stock.</p>
 
 		<DataTable
 			:columns="itemColumns"

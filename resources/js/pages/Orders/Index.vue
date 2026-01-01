@@ -142,12 +142,12 @@ const handleFilterUpdate = (filters: Record<string, any>) => {
 <template>
 	<Head title="Orders" />
 
-	<div class="p-8">
-		<div class="flex justify-between items-center mb-6">
-			<h1 class="text-3xl font-semibold text-gray-900">Orders</h1>
+	<div class="p-4 sm:p-6 md:p-8">
+		<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+			<h1 class="text-2xl sm:text-3xl font-semibold text-gray-900">Orders</h1>
 			<button
 				@click="router.visit('/orders/create')"
-				class="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-sm transition-colors"
+				class="w-full sm:w-auto px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-sm transition-colors touch-manipulation"
 			>
 				+ New Order (POS)
 			</button>
@@ -176,7 +176,7 @@ const handleFilterUpdate = (filters: Record<string, any>) => {
                  <button 
                     v-if="(row.status === 'pending') || (row.status !== 'pending' && $page.props.auth.user.roles?.includes('Super Admin'))"
                     @click.stop="router.visit(`/orders/${row.id}/edit`)" 
-                    class="px-3 py-1 rounded bg-blue-500 hover:bg-blue-600 text-white text-sm mr-2"
+                    class="px-3 py-1 rounded bg-blue-500 hover:bg-blue-600 text-white text-sm min-w-[60px] touch-manipulation"
                 >
                     Edit
                 </button>
@@ -184,7 +184,7 @@ const handleFilterUpdate = (filters: Record<string, any>) => {
                  <button 
                     v-if="row.status === 'pending'"
                     @click.stop="openCompleteModal(row)" 
-                    class="px-3 py-1 rounded bg-green-500 hover:bg-green-600 text-white text-sm mr-2"
+                    class="px-3 py-1 rounded bg-green-500 hover:bg-green-600 text-white text-sm min-w-[60px] touch-manipulation"
                 >
                     Complete
                 </button>
@@ -192,7 +192,7 @@ const handleFilterUpdate = (filters: Record<string, any>) => {
                  <button 
                     v-if="row.status !== 'cancelled' && row.status !== 'completed'"
                     @click.stop="openCancelModal(row)" 
-                    class="px-3 py-1 rounded bg-red-500 hover:bg-red-600 text-white text-sm"
+                    class="px-3 py-1 rounded bg-red-500 hover:bg-red-600 text-white text-sm min-w-[60px] touch-manipulation"
                 >
                     Cancel
                 </button>
@@ -207,16 +207,16 @@ const handleFilterUpdate = (filters: Record<string, any>) => {
 
         <!-- Complete Confirmation Modal -->
         <Modal :show="showComplete" @close="showComplete = false">
-             <div class="p-6">
+             <div class="p-4 sm:p-6">
                  <h2 class="text-lg font-medium text-gray-900">Complete Order #{{ orderToComplete?.id }}</h2>
                  <p class="mt-1 text-sm text-gray-600">
                      Are you sure you want to mark this order as completed?
                  </p>
-                 <div class="mt-6 flex justify-end space-x-3">
-                     <button @click="showComplete = false" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">
+                 <div class="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+                     <button @click="showComplete = false" class="w-full sm:w-auto px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 touch-manipulation">
                          Cancel
                      </button>
-                     <button @click="submitComplete" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700" :disabled="completeForm.processing">
+                     <button @click="submitComplete" class="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 touch-manipulation" :disabled="completeForm.processing">
                          Confirm Completion
                      </button>
                  </div>
@@ -225,29 +225,31 @@ const handleFilterUpdate = (filters: Record<string, any>) => {
 
         <!-- Cancel Logic Modal -->
          <Modal :show="showCancel" @close="showCancel = false">
-            <div class="p-6">
+            <div class="p-4 sm:p-6">
                 <h2 class="text-lg font-medium text-gray-900">Cancel Order #{{ orderToCancel?.id }}</h2>
                 <p class="mt-1 text-sm text-gray-600">
                     Are you sure you want to cancel this order?
                 </p>
                 
                 <div class="mt-4">
-                    <label class="flex items-center space-x-3">
-                        <input type="checkbox" v-model="cancelForm.wastage" class="form-checkbox h-5 w-5 text-red-600">
-                        <span class="text-gray-900 font-medium">Mark as Wastage?</span>
+                    <label class="flex items-start space-x-3">
+                        <input type="checkbox" v-model="cancelForm.wastage" class="form-checkbox h-5 w-5 text-red-600 mt-0.5">
+                        <div>
+                            <span class="text-gray-900 font-medium">Mark as Wastage?</span>
+                            <p class="text-sm text-gray-500 mt-1">
+                                If checked, items will <strong>NOT</strong> be returned to inventory.
+                                <br>
+                                If unchecked, items will be restocked.
+                            </p>
+                        </div>
                     </label>
-                    <p class="text-sm text-gray-500 mt-1 ml-8">
-                        If checked, items will <strong>NOT</strong> be returned to inventory.
-                        <br>
-                        If unchecked, items will be restocked.
-                    </p>
                 </div>
 
-                <div class="mt-6 flex justify-end space-x-3">
-                    <button @click="showCancel = false" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">
+                <div class="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+                    <button @click="showCancel = false" class="w-full sm:w-auto px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 touch-manipulation">
                         Dismiss
                     </button>
-                    <button @click="submitCancel" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700" :disabled="cancelForm.processing">
+                    <button @click="submitCancel" class="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 touch-manipulation" :disabled="cancelForm.processing">
                         Confirm Cancellation
                     </button>
                 </div>

@@ -15,8 +15,8 @@ const props = defineProps<{
 			id: number;
 			description: string;
 			subject_type: string | null;
-            subject_id: number | null;
-            subject?: { id: number; name?: string } | null;
+			subject_id: number | null;
+			subject?: { id: number; name?: string } | null;
 			causer?: { id: number; name?: string } | null;
 			created_at: string;
 			properties?: Record<string, any>;
@@ -44,36 +44,45 @@ const columns = [
 ];
 
 const formattedActivities = computed(() =>
-    props.activities.data.map((a) => {
-        const cleanedSubjectInfo = a.subject_type?.replace('App\\Models\\', '') ?? a.subject_type;
-        
-        let display_description = a.description;
+	props.activities.data.map((a) => {
+		// Extract just the class name from any namespace
+		const cleanedSubjectInfo = a.subject_type?.split('\\').pop() ?? a.subject_type;
 
-        if (['created', 'updated', 'deleted', 'restored'].includes(a.description)) {
-             const capitalizedDescription = a.description.charAt(0).toUpperCase() + a.description.slice(1);
-             
-             let subjectIdentifier = `#${a.subject_id ?? ''}`;
+		let display_description = a.description;
 
-             // Specific logic for Items to show Name
-             if (cleanedSubjectInfo === 'Item') {
-                if (a.subject && a.subject.name) {
-                    subjectIdentifier = `"${a.subject.name}"`;
-                } else if (a.properties?.attributes?.name) {
-                    subjectIdentifier = `"${a.properties.attributes.name}"`;
-                } else if (a.properties?.old?.name) { // For deleted items
-                    subjectIdentifier = `"${a.properties.old.name}"`;
-                }
-             }
+		// Special handling for remarks updates on activity logs
+		if (a.description === 'Updated remarks on activity log') {
+			const activityLogId = a.properties?.activity_log_id ?? a.subject_id;
+			display_description = `Updated remarks on Activity Log #${activityLogId}`;
+		}
+		else if (['created', 'updated', 'deleted', 'restored'].includes(a.description)) {
+			const capitalizedDescription =
+				a.description.charAt(0).toUpperCase() + a.description.slice(1);
 
-             display_description = `${capitalizedDescription} ${cleanedSubjectInfo ?? ''} ${subjectIdentifier}`.trim();
-        }
+			let subjectIdentifier = `#${a.subject_id ?? ''}`;
 
-        return {
-            ...a,
-            subject_type: cleanedSubjectInfo,
-            display_description: display_description
-        };
-    })
+			// Specific logic for Items to show Name
+			if (cleanedSubjectInfo === 'Item') {
+				if (a.subject && a.subject.name) {
+					subjectIdentifier = `"${a.subject.name}"`;
+				} else if (a.properties?.attributes?.name) {
+					subjectIdentifier = `"${a.properties.attributes.name}"`;
+				} else if (a.properties?.old?.name) {
+					// For deleted items
+					subjectIdentifier = `"${a.properties.old.name}"`;
+				}
+			}
+
+			display_description =
+				`${capitalizedDescription} ${cleanedSubjectInfo ?? ''} ${subjectIdentifier}`.trim();
+		}
+
+		return {
+			...a,
+			subject_type: cleanedSubjectInfo,
+			display_description: display_description
+		};
+	})
 );
 
 const showDetails = ref(false);
@@ -114,9 +123,20 @@ const saveRemarks = (remarks: string) => {
 		{
 			preserveScroll: true,
 			onSuccess: () => {
+				// Update the local activity data to reflect the new remarks
+				if (selectedActivity.value) {
+					selectedActivity.value.remarks = remarks;
+				}
+
+				// Find and update the activity in the activities list
+				const activityIndex = props.activities.data.findIndex(
+					(a) => a.id === selectedActivity.value?.id
+				);
+				if (activityIndex !== -1) {
+					props.activities.data[activityIndex].remarks = remarks;
+				}
+
 				showDetails.value = false;
-				// Optional: toast or alert here
-				alert('Remarks saved successfully!');
 			},
 			onError: (errors) => {
 				console.error('Failed to save remarks:', errors);
@@ -126,13 +146,20 @@ const saveRemarks = (remarks: string) => {
 };
 
 const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.getFullYear() + '-' +
-        String(date.getMonth() + 1).padStart(2, '0') + '-' +
-        String(date.getDate()).padStart(2, '0') + ' ' +
-        String(date.getHours()).padStart(2, '0') + ':' +
-        String(date.getMinutes()).padStart(2, '0') + ':' +
-        String(date.getSeconds()).padStart(2, '0');
+	const date = new Date(dateString);
+	return (
+		date.getFullYear() +
+		'-' +
+		String(date.getMonth() + 1).padStart(2, '0') +
+		'-' +
+		String(date.getDate()).padStart(2, '0') +
+		' ' +
+		String(date.getHours()).padStart(2, '0') +
+		':' +
+		String(date.getMinutes()).padStart(2, '0') +
+		':' +
+		String(date.getSeconds()).padStart(2, '0')
+	);
 };
 
 // Filter configuration
@@ -141,19 +168,21 @@ const filterConfigs = computed(() => [
 		key: 'action',
 		label: 'Action Type',
 		type: 'select' as const,
-		options: props.filterOptions?.actions.map(a => ({
-			value: a,
-			label: a.charAt(0).toUpperCase() + a.slice(1)
-		})) || []
+		options:
+			props.filterOptions?.actions.map((a) => ({
+				value: a,
+				label: a.charAt(0).toUpperCase() + a.slice(1)
+			})) || []
 	},
 	{
 		key: 'entity',
 		label: 'Entity Type',
 		type: 'select' as const,
-		options: props.filterOptions?.entities.map(e => ({
-			value: e,
-			label: e
-		})) || []
+		options:
+			props.filterOptions?.entities.map((e) => ({
+				value: e,
+				label: e
+			})) || []
 	},
 	{
 		key: 'date_from',
@@ -201,10 +230,10 @@ const handleFilterUpdate = (filters: Record<string, any>) => {
 			@paginate="handlePaginate"
 			@view="openDetails"
 		>
-            <template #cell-created_at="{ value }">
-                {{ formatDate(value) }}
-            </template>
-        </DataTable>
+			<template #cell-created_at="{ value }">
+				{{ formatDate(value) }}
+			</template>
+		</DataTable>
 
 		<!-- Details Modal -->
 		<ViewDetailsModal

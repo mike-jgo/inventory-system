@@ -28,9 +28,8 @@ COPY . .
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Laravel setup and optimization
+# Laravel setup
 RUN php artisan storage:link && \
-    php artisan optimize && \
     chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Setup Nginx

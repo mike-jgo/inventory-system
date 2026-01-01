@@ -15,5 +15,5 @@ COPY --chown=www-data:www-data . /var/www/html
 # 3. Move your deploy script to the location the image expects
 # We use 'mkdir -p' to ensure the directory exists before moving
 RUN mkdir -p /var/www/html/.docker && \
-    mv /var/www/html/00-laravel-deploy.sh /var/www/html/.docker/run.sh && \
+    mv /var/www/html/scripts/00-laravel-deploy.sh /var/www/html/.docker/run.sh && \
     chmod +x /var/www/html/.docker/run.sh

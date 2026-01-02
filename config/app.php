@@ -56,6 +56,31 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application Logo
+    |--------------------------------------------------------------------------
+    |
+    | This value specifies the logo file name (without extension) to be used
+    | on the login page. The system will automatically check for .svg, .png,
+    | .jpg, or .jpeg files with this name in the public directory.
+    |
+    */
+
+    'logo' => (function() {
+        $logoName = env('APP_LOGO', 'logo');
+        $extensions = ['svg', 'png', 'jpg', 'jpeg'];
+        
+        foreach ($extensions as $ext) {
+            if (file_exists(public_path("{$logoName}.{$ext}"))) {
+                return "{$logoName}.{$ext}";
+            }
+        }
+        
+        // Fallback to .svg if no file exists
+        return "{$logoName}.svg";
+    })(),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

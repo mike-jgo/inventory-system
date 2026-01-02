@@ -1,5 +1,9 @@
 #!/bin/sh
 
+echo "Clearing and caching configuration..."
+php artisan config:clear
+php artisan config:cache
+
 echo "Running database migrations..."
 php artisan migrate --force
 

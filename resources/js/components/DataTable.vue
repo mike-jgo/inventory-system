@@ -121,7 +121,6 @@ const hasPagination = computed(() => !!props.pagination && props.pagination.last
 					:key="link.label"
 					:disabled="!link.url"
 					@click="emit('paginate', link.url)"
-					v-html="link.label"
 					class="px-2 sm:px-3 py-1 sm:py-2 rounded border text-xs sm:text-sm min-w-[36px] touch-manipulation"
 					:class="[
 						link.active
@@ -129,6 +128,7 @@ const hasPagination = computed(() => !!props.pagination && props.pagination.last
 							: 'bg-white text-gray-700 hover:bg-gray-100 border-gray-300',
 						!link.url && 'opacity-50 cursor-not-allowed'
 					]"
+					v-html="link.label"
 				></button>
 			</div>
 		</div>

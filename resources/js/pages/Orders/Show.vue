@@ -14,6 +14,10 @@ const props = defineProps<{
 		type: string;
 		status: string;
 		total_amount: number;
+		payment_method: string;
+		amount_paid: number;
+		change_due: number;
+		payment_reference: string | null;
 		created_at: string;
 		updated_at: string;
 		user: {
@@ -67,6 +71,17 @@ const formatDate = (dateString: string) => {
 		minute: '2-digit'
 	});
 };
+
+const getPaymentMethodLabel = (method: string) => {
+	switch (method) {
+		case 'cash':
+			return 'Cash';
+		case 'gcash':
+			return 'GCash';
+		default:
+			return method;
+	}
+};
 </script>
 
 <template>
@@ -117,7 +132,9 @@ const formatDate = (dateString: string) => {
 				<div class="space-y-3">
 					<div>
 						<p class="text-sm text-gray-600">Customer Name</p>
-						<p class="font-medium text-gray-900">{{ order.customer_name || 'Guest' }}</p>
+						<p class="font-medium text-gray-900">
+							{{ order.customer_name || 'Guest' }}
+						</p>
 					</div>
 					<div>
 						<p class="text-sm text-gray-600">Order Type</p>
@@ -149,8 +166,54 @@ const formatDate = (dateString: string) => {
 			<div class="bg-white rounded-xl shadow-md p-6">
 				<h2 class="text-lg font-semibold text-gray-900 mb-4">Total Amount</h2>
 				<p class="text-3xl font-bold text-gray-900">
-					{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(order.total_amount) }}
+					{{
+						new Intl.NumberFormat('en-PH', {
+							style: 'currency',
+							currency: 'PHP'
+						}).format(order.total_amount)
+					}}
 				</p>
+			</div>
+		</div>
+
+		<!-- Payment Details -->
+		<div class="bg-white rounded-xl shadow-md p-6 mb-6">
+			<h2 class="text-xl font-semibold text-gray-900 mb-4">Payment Details</h2>
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+				<div>
+					<p class="text-sm text-gray-600">Payment Method</p>
+					<p class="font-medium text-gray-900 capitalize">
+						{{ order.payment_method === 'cash' ? '💵 Cash' : '📱 GCash' }}
+					</p>
+				</div>
+				<div>
+					<p class="text-sm text-gray-600">Amount Paid</p>
+					<p class="font-medium text-gray-900">
+						{{
+							new Intl.NumberFormat('en-PH', {
+								style: 'currency',
+								currency: 'PHP'
+							}).format(order.amount_paid)
+						}}
+					</p>
+				</div>
+				<div v-if="order.payment_method === 'cash' && order.change_due > 0">
+					<p class="text-sm text-gray-600">Change</p>
+					<p class="font-medium text-green-700">
+						{{
+							new Intl.NumberFormat('en-PH', {
+								style: 'currency',
+								currency: 'PHP'
+							}).format(order.change_due)
+						}}
+					</p>
+				</div>
+				<div v-if="order.payment_method === 'gcash' && order.payment_reference">
+					<p class="text-sm text-gray-600">Transaction Reference</p>
+					<p class="font-medium text-gray-900 font-mono text-sm">
+						{{ order.payment_reference }}
+					</p>
+				</div>
 			</div>
 		</div>
 
@@ -161,28 +224,46 @@ const formatDate = (dateString: string) => {
 				<table class="min-w-full divide-y divide-gray-200">
 					<thead class="bg-gray-50">
 						<tr>
-							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+							>
 								Item
 							</th>
-							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+							>
 								Price
 							</th>
-							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+							>
 								Quantity
 							</th>
-							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+							>
 								Subtotal
 							</th>
 						</tr>
 					</thead>
 					<tbody class="bg-white divide-y divide-gray-200">
-						<tr v-for="orderItem in order.order_items" :key="orderItem.id">
+						<tr
+							v-for="orderItem in order.order_items"
+							:key="orderItem.id"
+						>
 							<td class="px-6 py-4 whitespace-nowrap">
-								<div class="text-sm font-medium text-gray-900">{{ orderItem.item.name }}</div>
+								<div class="text-sm font-medium text-gray-900">
+									{{ orderItem.item.name }}
+								</div>
 							</td>
 							<td class="px-6 py-4 whitespace-nowrap">
 								<div class="text-sm text-gray-900">
-									{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(orderItem.price) }}
+									{{
+										new Intl.NumberFormat('en-PH', {
+											style: 'currency',
+											currency: 'PHP'
+										}).format(orderItem.price)
+									}}
 								</div>
 							</td>
 							<td class="px-6 py-4 whitespace-nowrap">
@@ -190,19 +271,32 @@ const formatDate = (dateString: string) => {
 							</td>
 							<td class="px-6 py-4 whitespace-nowrap">
 								<div class="text-sm font-medium text-gray-900">
-									{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(orderItem.price * orderItem.quantity) }}
+									{{
+										new Intl.NumberFormat('en-PH', {
+											style: 'currency',
+											currency: 'PHP'
+										}).format(orderItem.price * orderItem.quantity)
+									}}
 								</div>
 							</td>
 						</tr>
 					</tbody>
 					<tfoot class="bg-gray-50">
 						<tr>
-							<td colspan="3" class="px-2 py-2 text-right text-sm font-semibold text-gray-900">
+							<td
+								colspan="3"
+								class="px-2 py-2 text-right text-sm font-semibold text-gray-900"
+							>
 								Total:
 							</td>
 							<td class="px-6 py-4 whitespace-nowrap">
 								<div class="text-sm font-bold text-gray-900">
-									{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(order.total_amount) }}
+									{{
+										new Intl.NumberFormat('en-PH', {
+											style: 'currency',
+											currency: 'PHP'
+										}).format(order.total_amount)
+									}}
 								</div>
 							</td>
 						</tr>

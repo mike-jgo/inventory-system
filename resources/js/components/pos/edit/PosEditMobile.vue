@@ -72,6 +72,7 @@ const emit = defineEmits<{
 
 // Component-local state for tabs - start on cart for edit mode
 const activeTab = ref<'items' | 'cart'>('cart');
+const checkoutExpanded = ref(false);
 </script>
 
 <template>
@@ -153,7 +154,7 @@ const activeTab = ref<'items' | 'cart'>('cart');
 				/>
 
 				<!-- Categories (only on Items tab) -->
-				<div class="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide -mx-3 px-3">
+				<div class="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide">
 					<button
 						v-for="cat in categories"
 						:key="cat.id"
@@ -169,7 +170,6 @@ const activeTab = ref<'items' | 'cart'>('cart');
 						{{ cat.name }}
 					</button>
 				</div>
-
 				<!-- Items List (not grid) -->
 				<div class="space-y-2">
 					<button
@@ -237,7 +237,7 @@ const activeTab = ref<'items' | 'cart'>('cart');
 						v-if="cart.length === 0"
 						class="text-center text-gray-400 py-10"
 					>
-						Order is empty.
+						Cart is empty.
 					</div>
 					<div
 						v-else
@@ -285,201 +285,201 @@ const activeTab = ref<'items' | 'cart'>('cart');
 							</button>
 						</div>
 					</div>
-				</div>
 
-				<!-- Order Details Form -->
-				<div class="bg-white p-3 space-y-3 border-t border-gray-200">
-					<div>
-						<label class="block text-xs font-medium text-gray-700"
-							>Order Type</label
+					<!-- Collapsible Checkout Section -->
+					<div v-if="cart.length > 0" class="bg-white rounded-lg shadow-sm overflow-hidden">
+						<!-- Accordion Header -->
+						<button
+							type="button"
+							@pointerup.stop.prevent="checkoutExpanded = !checkoutExpanded"
+							class="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors touch-manipulation"
 						>
-						<select
-							v-model="form.type"
-							class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
-						>
-							<option value="dine_in">Dine In</option>
-							<option value="takeout">Takeout</option>
-							<option value="online">Online</option>
-						</select>
-					</div>
-					<div>
-						<label class="block text-xs font-medium text-gray-700"
-							>Customer Name</label
-						>
-						<input
-							type="text"
-							v-model="form.customer_name"
-							class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
-							placeholder="Guest"
-						/>
-					</div>
-					<div>
-						<label class="block text-xs font-medium text-gray-700"
-							>Status</label
-						>
-						<select
-							v-model="form.status"
-							class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
-						>
-							<option value="pending">Pending</option>
-							<option value="completed">Completed</option>
-							<option value="cancelled">Cancelled</option>
-						</select>
-					</div>
-
-					<!-- Payment Section -->
-					<div class="border-t border-gray-300 pt-3 space-y-3">
-						<h3 class="text-xs font-semibold text-gray-700">Payment</h3>
-
-						<!-- Payment Method -->
-						<div>
-							<label class="block text-xs font-medium text-gray-700 mb-2"
-								>Payment Method</label
+							<span class="text-sm font-semibold text-gray-700">Order Details & Payment</span>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								:class="['h-5 w-5 text-gray-500 transition-transform', checkoutExpanded ? 'rotate-180' : '']"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
 							>
-							<div class="flex space-x-2">
-								<button
-									type="button"
-									@pointerup.stop.prevent="form.payment_method = 'cash'"
-									:class="[
-										'flex-1 py-2 px-3 rounded-md text-xs font-medium transition-colors touch-manipulation',
-										form.payment_method === 'cash'
-											? 'bg-indigo-600 text-white'
-											: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-									]"
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+							</svg>
+						</button>
+
+						<!-- Accordion Content -->
+						<div v-show="checkoutExpanded" class="p-3 space-y-3 border-t border-gray-200">
+							<!-- Order Type -->
+							<div>
+								<label class="block text-xs font-medium text-gray-700">Order Type</label>
+								<select
+									v-model="form.type"
+									class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
 								>
-									💵 Cash
-								</button>
-								<button
-									type="button"
-									@pointerup.stop.prevent="form.payment_method = 'gcash'"
-									:class="[
-										'flex-1 py-2 px-3 rounded-md text-xs font-medium transition-colors touch-manipulation',
-										form.payment_method === 'gcash'
-											? 'bg-indigo-600 text-white'
-											: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-									]"
-								>
-									📱 GCash
-								</button>
+									<option value="dine_in">Dine In</option>
+									<option value="takeout">Takeout</option>
+									<option value="online">Online</option>
+								</select>
 							</div>
-						</div>
 
-						<!-- Cash Payment -->
-						<div v-if="form.payment_method === 'cash'">
-							<label class="block text-xs font-medium text-gray-700"
-								>Amount Tendered</label
-							>
-							<input
-								type="number"
-								v-model.number="form.amount_paid"
-								step="0.01"
-								:min="cartTotal"
-								class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
-								placeholder="0.00"
-							/>
-							<div class="mt-2 flex flex-wrap gap-2">
-								<button
-									type="button"
-									@pointerup.stop.prevent="setExactAmount()"
-									class="px-3 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 touch-manipulation"
-								>
-									Exact
-								</button>
-
-								<button
-									v-for="amt in quickCashOptions"
-									:key="amt"
-									type="button"
-									@pointerup.stop.prevent="form.amount_paid = amt"
-									class="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 touch-manipulation"
-								>
-									{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(amt) }}
-								</button>
-
-								<button
-									type="button"
-									@pointerup.stop.prevent="addCash(100)"
-									class="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 touch-manipulation"
-								>
-									+₱100
-								</button>
-
-								<button
-									type="button"
-									@pointerup.stop.prevent="addCash(500)"
-									class="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 touch-manipulation"
-								>
-									+₱500
-								</button>
+							<!-- Customer Name -->
+							<div>
+								<label class="block text-xs font-medium text-gray-700">Customer Name (Optional)</label>
+								<input
+									type="text"
+									v-model="form.customer_name"
+									class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+									placeholder="Guest"
+								/>
 							</div>
-							<div
-								v-if="form.amount_paid > 0"
-								class="mt-2 p-2 bg-green-50 rounded-md"
-							>
-								<div class="flex justify-between text-xs">
-									<span class="font-medium text-gray-700">Change:</span>
-									<span class="font-bold text-green-700">{{
-										new Intl.NumberFormat('en-PH', {
-											style: 'currency',
-											currency: 'PHP'
-										}).format(changeDue)
-									}}</span>
+
+							<!-- Status -->
+							<div>
+								<label class="block text-xs font-medium text-gray-700">Status</label>
+								<select
+									v-model="form.status"
+									class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+								>
+									<option value="pending">Pending</option>
+									<option value="completed">Completed</option>
+									<option value="cancelled">Cancelled</option>
+								</select>
+							</div>
+
+							<!-- Payment Section -->
+							<div class="pt-3 space-y-3 border-t border-gray-200">
+								<h3 class="text-sm font-semibold text-gray-900">Payment</h3>
+
+								<!-- Payment Method (Segmented Control) -->
+								<div>
+									<label class="block text-xs font-medium text-gray-700 mb-2">Method</label>
+									<div class="flex rounded-lg overflow-hidden border border-gray-300">
+										<button
+											type="button"
+											@pointerup.stop.prevent="form.payment_method = 'cash'"
+											:class="[
+												'flex-1 py-2.5 px-3 text-sm font-semibold transition-all touch-manipulation',
+												form.payment_method === 'cash'
+													? 'bg-indigo-600 text-white'
+													: 'bg-white text-gray-700 hover:bg-gray-50'
+											]"
+										>
+											💵 Cash
+										</button>
+										<button
+											type="button"
+											@pointerup.stop.prevent="form.payment_method = 'gcash'"
+											:class="[
+												'flex-1 py-2.5 px-3 text-sm font-semibold transition-all touch-manipulation border-l border-gray-300',
+												form.payment_method === 'gcash'
+													? 'bg-indigo-600 text-white'
+													: 'bg-white text-gray-700 hover:bg-gray-50'
+											]"
+										>
+											📱 GCash
+										</button>
+									</div>
+								</div>
+
+								<!-- Cash Payment -->
+								<div v-if="form.payment_method === 'cash'">
+									<label class="block text-xs font-medium text-gray-700">Amount Tendered</label>
+									<input
+										type="number"
+										v-model.number="form.amount_paid"
+										step="0.01"
+										:min="cartTotal"
+										class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+										placeholder="0.00"
+									/>
+									<!-- Horizontal Scrolling Quick Cash -->
+									<div class="mt-2 flex space-x-2 overflow-x-auto pb-2 scrollbar-hide">
+										<button
+											type="button"
+											@pointerup.stop.prevent="setExactAmount()"
+											class="px-3 py-1.5 text-xs bg-green-100 text-green-700 rounded-md hover:bg-green-200 touch-manipulation whitespace-nowrap flex-shrink-0"
+										>
+											Exact
+										</button>
+
+										<button
+											v-for="amt in quickCashOptions"
+											:key="amt"
+											type="button"
+											@pointerup.stop.prevent="form.amount_paid = amt"
+											class="px-3 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 touch-manipulation whitespace-nowrap flex-shrink-0"
+										>
+											{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(amt) }}
+										</button>
+
+										<button
+											type="button"
+											@pointerup.stop.prevent="addCash(100)"
+											class="px-3 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 touch-manipulation whitespace-nowrap flex-shrink-0"
+										>
+											+₱100
+										</button>
+
+										<button
+											type="button"
+											@pointerup.stop.prevent="addCash(500)"
+											class="px-3 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 touch-manipulation whitespace-nowrap flex-shrink-0"
+										>
+											+₱500
+										</button>
+									</div>
+
+									<!-- Change Display -->
+									<div v-if="form.amount_paid > 0" class="mt-2 p-2 bg-green-50 rounded-md">
+										<div class="flex justify-between text-xs">
+											<span class="font-medium text-gray-700">Change:</span>
+											<span class="font-bold text-green-700">{{
+												new Intl.NumberFormat('en-PH', {
+													style: 'currency',
+													currency: 'PHP'
+												}).format(changeDue)
+											}}</span>
+										</div>
+									</div>
+									<p v-if="form.errors.amount_paid" class="mt-1 text-xs text-red-600">
+										{{ form.errors.amount_paid }}
+									</p>
+								</div>
+
+								<!-- GCash Payment -->
+								<div v-if="form.payment_method === 'gcash'">
+									<label class="block text-xs font-medium text-gray-700">Transaction Reference</label>
+									<input
+										type="text"
+										v-model="form.payment_reference"
+										class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+										placeholder="Enter GCash reference number"
+									/>
+									<div class="mt-2 p-2 bg-blue-50 rounded-md">
+										<div class="flex justify-between text-xs">
+											<span class="font-medium text-gray-700">Amount to Pay:</span>
+											<span class="font-bold text-blue-700">{{
+												new Intl.NumberFormat('en-PH', {
+													style: 'currency',
+													currency: 'PHP'
+												}).format(cartTotal)
+											}}</span>
+										</div>
+									</div>
+									<p v-if="form.errors.payment_reference" class="mt-1 text-xs text-red-600">
+										{{ form.errors.payment_reference }}
+									</p>
 								</div>
 							</div>
-							<p
-								v-if="form.errors.amount_paid"
-								class="mt-1 text-xs text-red-600"
-							>
-								{{ form.errors.amount_paid }}
-							</p>
-						</div>
-
-						<!-- GCash Payment -->
-						<div v-if="form.payment_method === 'gcash'">
-							<label class="block text-xs font-medium text-gray-700"
-								>Transaction Reference</label
-							>
-							<input
-								type="text"
-								v-model="form.payment_reference"
-								class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
-								placeholder="Enter GCash reference number"
-							/>
-							<div class="mt-2 p-2 bg-blue-50 rounded-md">
-								<div class="flex justify-between text-xs">
-									<span class="font-medium text-gray-700">Amount to Pay:</span>
-									<span class="font-bold text-blue-700">{{
-										new Intl.NumberFormat('en-PH', {
-											style: 'currency',
-											currency: 'PHP'
-										}).format(cartTotal)
-									}}</span>
-								</div>
-							</div>
-							<p
-								v-if="form.errors.payment_reference"
-								class="mt-1 text-xs text-red-600"
-							>
-								{{ form.errors.payment_reference }}
-							</p>
 						</div>
 					</div>
-
-					<button
-						type="button"
-						@pointerup.stop.prevent="emit('submit')"
-						:disabled="cart.length === 0 || form.processing"
-						class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow transition-colors disabled:opacity-50 touch-manipulation text-sm"
-					>
-						{{ form.processing ? 'Updating...' : 'Update Order' }}
-					</button>
 				</div>
 			</div>
 		</div>
 
-		<!-- Sticky Bottom Bar -->
+		<!-- Sticky Bottom Bar (Context-Aware) -->
 		<div class="fixed bottom-0 inset-x-0 lg:hidden bg-white border-t border-gray-200 p-3 shadow-lg z-20">
-			<div class="flex items-center justify-between">
+			<!-- Items Tab: Show "View Cart" -->
+			<div v-if="activeTab === 'items'" class="flex items-center justify-between">
 				<div>
 					<div class="text-xs text-gray-500">Total</div>
 					<div class="text-lg font-bold text-gray-900">
@@ -494,7 +494,8 @@ const activeTab = ref<'items' | 'cart'>('cart');
 				<button
 					type="button"
 					@pointerup.stop.prevent="activeTab = 'cart'"
-					class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium text-sm touch-manipulation flex items-center space-x-2"
+					:disabled="cart.length === 0"
+					class="bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white px-5 py-3 rounded-lg font-semibold text-sm touch-manipulation flex items-center space-x-2 transition-colors"
 				>
 					<span>View Cart</span>
 					<span
@@ -503,6 +504,34 @@ const activeTab = ref<'items' | 'cart'>('cart');
 					>
 						{{ cartItemCount }}
 					</span>
+				</button>
+			</div>
+
+			<!-- Cart Tab: Show "Update Order" -->
+			<div v-else-if="activeTab === 'cart'" class="flex flex-col space-y-2">
+				<!-- Summary Row -->
+				<div class="flex items-center justify-between text-sm">
+					<span class="text-gray-600">{{ cartItemCount }} {{ cartItemCount === 1 ? 'item' : 'items' }}</span>
+					<div class="text-right">
+						<div class="font-bold text-gray-900 text-lg">
+							{{
+								new Intl.NumberFormat('en-PH', {
+									style: 'currency',
+									currency: 'PHP'
+								}).format(cartTotal)
+							}}
+						</div>
+					</div>
+				</div>
+				
+				<!-- CTA Button -->
+				<button
+					type="button"
+					@pointerup.stop.prevent="emit('submit')"
+					:disabled="cart.length === 0 || form.processing"
+					class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation text-base"
+				>
+					{{ form.processing ? 'Processing...' : 'Update Order' }}
 				</button>
 			</div>
 		</div>

@@ -16,12 +16,21 @@ class Order extends Model
         'type',
         'status',
         'total_amount',
+        'payment_method',
+        'amount_paid',
+        'change_due',
+        'payment_reference',
         'wastage',
     ];
 
+
     protected $casts = [
         'wastage' => 'boolean',
+        'total_amount' => 'decimal:2',
+        'amount_paid' => 'decimal:2',
+        'change_due' => 'decimal:2',
     ];
+
 
     public function getActivitylogOptions(): LogOptions
     {

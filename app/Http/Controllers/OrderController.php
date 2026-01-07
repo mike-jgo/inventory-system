@@ -70,11 +70,17 @@ class OrderController extends Controller
         $validated = $request->validate([
             'customer_name' => 'nullable|string|max:255',
             'type' => 'required|in:dine_in,takeout,online',
-            'status' => 'required|in:pending,completed,cancelled', // Allow setting status
+            'status' => 'required|in:pending,completed,cancelled',
+
             'items' => 'required|array|min:1',
             'items.*.id' => 'required|exists:items,id',
             'items.*.quantity' => 'required|integer|min:1',
+
+            'payment_method' => 'required|in:cash,gcash',
+            'amount_paid' => 'required_if:payment_method,cash|nullable|numeric|min:0',
+            'payment_reference' => 'required_if:payment_method,gcash|nullable|string|max:255',
         ]);
+
 
         return DB::transaction(function () use ($validated) {
             $totalAmount = 0;
@@ -94,6 +100,33 @@ class OrderController extends Controller
                 $itemsToProcess[] = ['model' => $item, 'quantity' => $itemData['quantity'], 'price' => $item->price];
             }
 
+            // Validate payment + compute change due
+            $changeDue = 0.00;
+
+            if ($validated['payment_method'] === 'cash') {
+                $validated['payment_reference'] = null;
+                $amountPaid = (float) ($validated['amount_paid'] ?? 0);
+
+                if ($amountPaid < $totalAmount) {
+                    throw ValidationException::withMessages([
+                        'amount_paid' => ['Payment amount must be at least ' . number_format($totalAmount, 2)],
+                    ]);
+                }
+
+                $changeDue = $amountPaid - $totalAmount;
+            } else {
+                // GCash: no change, and amount_paid doesn't need to be >= total in your current logic
+                // Choose ONE of these based on how you want to store it:
+
+                // Option A (recommended): store amount_paid as the total amount (meaning "paid in full")
+                $validated['amount_paid'] = $totalAmount;
+
+                // Option B: store amount_paid as 0 (meaning "not cash tendered")
+                // $validated['amount_paid'] = 0;
+
+                $changeDue = 0.00;
+            }
+
             // Create Order
             $order = Order::create([
                 'user_id' => Auth::id(),
@@ -101,6 +134,10 @@ class OrderController extends Controller
                 'type' => $validated['type'],
                 'status' => $validated['status'], // Use validated status
                 'total_amount' => $totalAmount,
+                'payment_method' => $validated['payment_method'],
+                'amount_paid' => $validated['amount_paid'],
+                'change_due' => $changeDue,
+                'payment_reference' => $validated['payment_reference'] ?? null,
             ]);
 
             // Create Order Items and Update Stock
@@ -188,10 +225,16 @@ class OrderController extends Controller
             'customer_name' => 'nullable|string|max:255',
             'type' => 'required|in:dine_in,takeout,online',
             'status' => 'required|in:pending,completed,cancelled',
+
             'items' => 'required|array|min:1',
             'items.*.id' => 'required|exists:items,id',
             'items.*.quantity' => 'required|integer|min:1',
+
+            'payment_method' => 'required|in:cash,gcash',
+            'amount_paid' => 'required_if:payment_method,cash|nullable|numeric|min:0',
+            'payment_reference' => 'required_if:payment_method,gcash|nullable|string|max:255',
         ]);
+
 
         return DB::transaction(function () use ($order, $validated) {
 
@@ -259,12 +302,44 @@ class OrderController extends Controller
                 }
             }
 
-            // 2. Update Order Details
+            // 2. Validate payment + compute change due
+            $changeDue = 0.00;
+
+            if ($validated['payment_method'] === 'cash') {
+                $validated['payment_reference'] = null;
+                $amountPaid = (float) ($validated['amount_paid'] ?? 0);
+
+                if ($amountPaid < $totalAmount) {
+                    throw ValidationException::withMessages([
+                        'amount_paid' => ['Payment amount must be at least ' . number_format($totalAmount, 2)],
+                    ]);
+                }
+
+                $changeDue = $amountPaid - $totalAmount;
+            } else {
+                // GCash: no change, and amount_paid doesn't need to be >= total in your current logic
+                // Choose ONE of these based on how you want to store it:
+
+                // Option A (recommended): store amount_paid as the total amount (meaning "paid in full")
+                $validated['amount_paid'] = $totalAmount;
+
+                // Option B: store amount_paid as 0 (meaning "not cash tendered")
+                // $validated['amount_paid'] = 0;
+
+                $changeDue = 0.00;
+            }
+
+
+            // 3. Update Order Details
             $order->update([
                 'customer_name' => $validated['customer_name'],
                 'type' => $validated['type'],
                 'status' => $validated['status'],
-                'total_amount' => $totalAmount
+                'total_amount' => $totalAmount,
+                'payment_method' => $validated['payment_method'],
+                'amount_paid' => $validated['amount_paid'],
+                'change_due' => $changeDue,
+                'payment_reference' => $validated['payment_reference'] ?? null,
             ]);
 
             // activity()

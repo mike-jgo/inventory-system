@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -18,30 +19,30 @@ class LoginController extends Controller
         return Inertia::render('Auth/Login');
     }
 
-    public function attempt(Request $request)
+    public function attempt(LoginRequest $request)
     {
-        // Validate login input
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string'],
-        ]);
+        // Validates credentials + enforces rate limiting (5 attempts before lockout)
+        $user = $request->validateCredentials();
 
-        // Check credentials
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
+        Auth::login($user, $request->boolean('remember'));
+        $request->session()->regenerate();
 
-            // Redirect to dashboard or home
-            return redirect()->intended(route('dashboard'));
-        }
+        // [2.4.3] Log successful login
+        activity()
+            ->causedBy($user)
+            ->withProperties(['ip' => $request->ip()])
+            ->log('login');
 
-        // Invalid credentials
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ]);
+        return redirect()->intended(route('dashboard'));
     }
 
     public function logout(Request $request)
     {
+        // [2.4.3] Log logout before session is destroyed
+        activity()
+            ->causedBy(Auth::user())
+            ->log('logout');
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

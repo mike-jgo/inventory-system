@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { Link } from '@inertiajs/vue3';
 
 interface DropdownItem {
 	name: string;
-	action: () => void;
+	action?: () => void;
+	href?: string;
 }
 
 interface Props {
@@ -62,14 +64,23 @@ const handleItemClick = (item: DropdownItem) => {
 			class="absolute mt-1 min-w-max bg-white rounded-lg shadow-lg z-50"
 			:class="alignmentClass"
 		>
-			<button
-				v-for="item in items"
-				:key="item.name"
-				@click="handleItemClick(item)"
-				class="w-full text-left block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors first:rounded-t-lg last:rounded-b-lg"
-			>
-				{{ item.name }}
-			</button>
+			<template v-for="item in items" :key="item.name">
+				<Link
+					v-if="item.href"
+					:href="item.href"
+					@click="emit('close')"
+					class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors first:rounded-t-lg last:rounded-b-lg"
+				>
+					{{ item.name }}
+				</Link>
+				<button
+					v-else
+					@click="handleItemClick(item)"
+					class="w-full text-left block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors first:rounded-t-lg last:rounded-b-lg"
+				>
+					{{ item.name }}
+				</button>
+			</template>
 		</div>
 	</div>
 </template>

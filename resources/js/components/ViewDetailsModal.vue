@@ -48,6 +48,25 @@ const saveRemarks = () => {
 				</p>
 			</div>
 
+			<!-- Security / Audit Event Details (login, login_failed, access_denied, etc.) -->
+			<div
+				v-if="model?.properties && !model.properties.attributes && !model.properties.old && Object.keys(model.properties).length > 0"
+				class="mt-2"
+			>
+				<h3 class="text-md font-semibold text-gray-800 mb-2">Event Details</h3>
+				<table class="w-full text-sm border border-gray-200 rounded">
+					<tbody>
+						<tr v-for="(val, key) in model.properties" :key="key" class="border-t border-gray-100">
+							<td class="p-2 font-medium capitalize w-1/3 text-gray-600">{{ String(key).replace(/_/g, ' ') }}</td>
+							<td class="p-2">
+								<template v-if="Array.isArray(val)">{{ val.length ? val.join(', ') : '—' }}</template>
+								<template v-else>{{ val ?? '—' }}</template>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
 			<!-- Changes Table -->
 			<div
 				v-if="model?.properties && (model.properties.attributes || model.properties.old)"

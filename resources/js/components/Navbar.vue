@@ -86,39 +86,37 @@ onUnmounted(() => {
 // Define navigation structure with dropdowns
 const navGroups = computed(() => {
 	const groups: any[] = [
-		{
-			name: 'Dashboard',
-			href: route('dashboard'),
-			isSingle: true
-		},
-		{
-			name: 'Inventory Management',
-			items: [
-				{ name: 'Items', href: route('items.index') },
-				{ name: 'Categories', href: route('categories.index') }
-			]
-		},
-		{
+		{ name: 'Dashboard', href: route('dashboard'), isSingle: true },
+	];
+
+	// Inventory Management — Product Manager + Super Admin only
+	if (user.value?.can?.manage_items) {
+		const invItems: any[] = [
+			{ name: 'Items', href: route('items.index') },
+			{ name: 'Categories', href: route('categories.index') },
+		];
+		if (user.value?.can?.view_inventory) {
+			invItems.unshift({ name: 'Inventory', href: route('inventory.index') });
+		}
+		groups.push({ name: 'Inventory Management', items: invItems });
+	}
+
+	// Operations dropdown (Super Admin) or standalone Orders (everyone else)
+	if (user.value?.can?.view_activity_log) {
+		groups.push({
 			name: 'Operations',
 			items: [
 				{ name: 'Orders', href: route('orders.index') },
-				{ name: 'Activity Log', href: route('activity-log.index') }
-			]
-		}
-	];
-
-	// Add Inventory to Inventory Management group if superadmin
-	if (user.value && user.value.can?.view_inventory) {
-		groups[1].items.unshift({ name: 'Inventory', href: route('inventory.index') });
+				{ name: 'Activity Log', href: route('activity-log.index') },
+			],
+		});
+	} else {
+		groups.push({ name: 'Orders', href: route('orders.index'), isSingle: true });
 	}
 
-	// Add Users as a separate item if superadmin
-	if (user.value && user.value.can?.view_users) {
-		groups.push({
-			name: 'Users',
-			href: route('users.index'),
-			isSingle: true
-		});
+	// Users — Super Admin only
+	if (user.value?.can?.view_users) {
+		groups.push({ name: 'Users', href: route('users.index'), isSingle: true });
 	}
 
 	return groups;
@@ -217,7 +215,7 @@ const isDropdownActive = (items: any[]) => {
 					<Dropdown
 						v-if="user"
 						:name="user.name"
-						:items="[{ name: 'Logout', action: logout }]"
+						:items="[{ name: 'Change Password', href: route('password.change') }, { name: 'Logout', action: logout }]"
 						:is-open="userDropdownOpen"
 						align="right"
 						class="ml-4"
@@ -314,11 +312,18 @@ const isDropdownActive = (items: any[]) => {
 				</div>
 			</div>
 
-			<!-- Mobile Logout -->
+			<!-- Mobile User Actions -->
 			<div
 				v-if="user"
 				class="pt-3 border-t mt-2"
 			>
+				<Link
+					:href="route('password.change')"
+					@click="mobileMenuOpen = false"
+					class="block px-3 py-3 text-gray-700 hover:bg-gray-100 rounded font-medium touch-manipulation"
+				>
+					Change Password
+				</Link>
 				<button
 					@click="logout"
 					class="w-full text-left px-3 py-3 text-gray-700 hover:bg-gray-100 rounded font-medium touch-manipulation"

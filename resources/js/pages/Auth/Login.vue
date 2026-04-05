@@ -37,6 +37,16 @@ const submit = () => {
       </h1>
 
       <form @submit.prevent="submit">
+        <!-- Success message (e.g. after password reset) -->
+        <div v-if="$page.props.flash?.status" class="mb-4 text-green-600 text-sm text-center">
+          {{ $page.props.flash.status }}
+        </div>
+
+        <!-- Generic login error (does not reveal which field failed) -->
+        <div v-if="form.errors.login" class="mb-4 text-red-600 text-sm text-center">
+          {{ form.errors.login }}
+        </div>
+
         <!-- Email -->
         <div class="mb-4">
           <label class="block mb-1 text-gray-700">Email</label>
@@ -46,23 +56,22 @@ const submit = () => {
             class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
-          <div v-if="form.errors.email" class="text-red-600 text-sm mt-1">
-            {{ form.errors.email }}
-          </div>
         </div>
 
         <!-- Password -->
         <div class="mb-4">
-          <label class="block mb-1 text-gray-700">Password</label>
+          <div class="flex justify-between items-center mb-1">
+            <label class="text-gray-700">Password</label>
+            <Link :href="route('password.request')" class="text-sm text-blue-500 hover:underline">
+              Forgot password?
+            </Link>
+          </div>
           <input
             v-model="form.password"
             type="password"
             class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
-          <div v-if="form.errors.password" class="text-red-600 text-sm mt-1">
-            {{ form.errors.password }}
-          </div>
         </div>
 
         <!-- Remember Me -->

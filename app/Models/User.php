@@ -23,6 +23,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'last_login_at',
+        'last_failed_login_at',
+        'password_changed_at',
     ];
 
     /**
@@ -42,6 +45,11 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
+    public function passwordHistories()
+    {
+        return $this->hasMany(PasswordHistory::class)->latest('created_at');
+    }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -50,8 +58,11 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'email_verified_at'      => 'datetime',
+            'password'               => 'hashed',
+            'last_login_at'          => 'datetime',
+            'last_failed_login_at'   => 'datetime',
+            'password_changed_at'    => 'datetime',
         ];
     }
 }

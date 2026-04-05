@@ -18,6 +18,11 @@ class OrderController extends Controller
     {
         $query = Order::with('user');
 
+        // Customers only see their own orders
+        if (auth()->user()->hasRole('Customer')) {
+            $query->where('user_id', auth()->id());
+        }
+
         // Search filter
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -47,6 +52,10 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
+        if (auth()->user()->hasRole('Customer') && $order->user_id !== auth()->id()) {
+            abort(403);
+        }
+
         $order->load(['orderItems.item', 'user']);
 
         return Inertia::render('Orders/Show', [
@@ -164,6 +173,10 @@ class OrderController extends Controller
 
     public function edit(Order $order)
     {
+        if (!auth()->user()->hasAnyRole(['Super Admin', 'Product Manager']) && $order->user_id !== auth()->id()) {
+            abort(403);
+        }
+
         if ($order->status === 'cancelled' && !$order->wastage && !request()->user()->hasRole('Super Admin')) {
             return redirect()->route('orders.index')->withErrors('Cannot edit cancelled orders.');
         }
@@ -183,6 +196,10 @@ class OrderController extends Controller
 
     public function update(Request $request, Order $order)
     {
+        if (!auth()->user()->hasAnyRole(['Super Admin', 'Product Manager']) && $order->user_id !== auth()->id()) {
+            abort(403);
+        }
+
         // Cancel Logic
         if ($request->has('wastage')) {
             $validated = $request->validate([

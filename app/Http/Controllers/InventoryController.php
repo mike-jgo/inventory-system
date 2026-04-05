@@ -4,18 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Inventory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class InventoryController extends Controller
 {
     public function index()
     {
-        // Check if user is superadmin
-        if (!Auth::user()->hasRole('Super Admin')) {
-            abort(403, 'Unauthorized action.');
-        }
-
         $inventories = Inventory::orderBy('created_at', 'desc')->paginate(10);
 
         return Inertia::render('Inventory/Index', [
@@ -25,11 +19,6 @@ class InventoryController extends Controller
 
     public function store(Request $request)
     {
-        // Check if user is superadmin
-        if (!Auth::user()->hasRole('Super Admin')) {
-            abort(403, 'Unauthorized action.');
-        }
-
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'supplier' => 'required|string|max:255',
@@ -45,11 +34,6 @@ class InventoryController extends Controller
 
     public function update(Request $request, Inventory $inventory)
     {
-        // Check if user is superadmin
-        if (!Auth::user()->hasRole('Super Admin')) {
-            abort(403, 'Unauthorized action.');
-        }
-
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'supplier' => 'required|string|max:255',
@@ -65,11 +49,6 @@ class InventoryController extends Controller
 
     public function destroy(Inventory $inventory)
     {
-        // Check if user is superadmin
-        if (!Auth::user()->hasRole('Super Admin')) {
-            abort(403, 'Unauthorized action.');
-        }
-
         $inventoryName = $inventory->name;
         $inventory->delete();
 

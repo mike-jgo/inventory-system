@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -21,7 +22,7 @@ class UserController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users,email',
-            'password' => 'required|string|min:8',
+            'password' => ['required', Password::min(8)->mixedCase()->numbers()->symbols()],
             'roles' => 'nullable', // Allow string or array
         ]);
 
@@ -43,7 +44,7 @@ class UserController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => "required|string|email|unique:users,email,{$user->id}",
-            'password' => 'nullable|string|min:8',
+            'password' => ['nullable', Password::min(8)->mixedCase()->numbers()->symbols()],
             'roles' => 'nullable',
         ]);
 

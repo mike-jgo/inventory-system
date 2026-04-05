@@ -47,12 +47,28 @@ class LoginRequest extends FormRequest
         if (! $user || ! Auth::getProvider()->validateCredentials($user, $this->only('password'))) {
             RateLimiter::hit($this->throttleKey());
 
+            // [2.1.12] Record failed login timestamp
+            if ($user) {
+                $user->update(['last_failed_login_at' => now()]);
+            }
+
+            // [2.4.6] Log failed login attempt
+            activity()
+                ->causedBy($user)
+                ->withProperties(['ip' => $this->ip(), 'email' => $this->input('email')])
+                ->log('login_failed');
+
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'login' => 'Invalid username and/or password.',
             ]);
         }
 
         RateLimiter::clear($this->throttleKey());
+
+        // [2.1.12] Preserve previous login time before overwriting
+        $this->session()->put('previous_login_at', $user->last_login_at?->toDateTimeString());
+
+        $user->update(['last_login_at' => now()]);
 
         return $user;
     }
@@ -73,7 +89,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
+            'login' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),

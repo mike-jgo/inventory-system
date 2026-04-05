@@ -80,7 +80,8 @@ const formatDate = (dateString: string) => {
 		day: 'numeric',
 		year: 'numeric',
 		hour: '2-digit',
-		minute: '2-digit'
+		minute: '2-digit',
+		timeZone: 'Asia/Manila',
 	});
 };
 
@@ -108,41 +109,50 @@ const getStatusColor = (status: string) => {
 				Welcome back, {{ auth?.name }}!
 			</h1>
 			<p class="text-gray-600 text-base sm:text-lg">Here's what's happening with your inventory today.</p>
+			<!-- [2.1.12] Last login notice -->
+			<p v-if="auth?.last_login_at" class="mt-2 text-sm text-gray-500">
+				Last login: {{ formatDate(auth.last_login_at) }}
+			</p>
+			<p v-else class="mt-2 text-sm text-gray-500">
+				This is your first login.
+			</p>
 		</div>
 
-		<!-- Statistics Cards -->
-		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-			<Link
-				v-for="stat in statCards"
-				:key="stat.title"
-				:href="stat.link"
-				class="bg-white rounded-xl shadow-md p-5 sm:p-6 hover:shadow-lg transition-shadow duration-200 cursor-pointer touch-manipulation"
-			>
-				<div class="flex items-center justify-between">
-					<div>
-						<p class="text-gray-600 text-sm font-medium mb-1">{{ stat.title }}</p>
-						<p class="text-2xl sm:text-3xl font-bold text-gray-900">{{ stat.value }}</p>
-					</div>
-				</div>
-			</Link>
-		</div>
-
-		<!-- Quick Actions -->
-		<div class="mb-6 sm:mb-8">
-			<h2 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-			<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+		<!-- Statistics Cards — staff only -->
+		<template v-if="auth?.can?.manage_items">
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
 				<Link
-					v-for="action in quickActions"
-					:key="action.title"
-					:href="action.link"
-					:class="action.color"
-					class="text-white rounded-lg shadow-md p-5 sm:p-6 transition-all duration-200 transform hover:scale-105 touch-manipulation"
+					v-for="stat in statCards"
+					:key="stat.title"
+					:href="stat.link"
+					class="bg-white rounded-xl shadow-md p-5 sm:p-6 hover:shadow-lg transition-shadow duration-200 cursor-pointer touch-manipulation"
 				>
-					<h3 class="text-lg sm:text-xl font-semibold mb-2">{{ action.title }}</h3>
-					<p class="text-white/90 text-sm">{{ action.description }}</p>
+					<div class="flex items-center justify-between">
+						<div>
+							<p class="text-gray-600 text-sm font-medium mb-1">{{ stat.title }}</p>
+							<p class="text-2xl sm:text-3xl font-bold text-gray-900">{{ stat.value }}</p>
+						</div>
+					</div>
 				</Link>
 			</div>
-		</div>
+
+			<!-- Quick Actions -->
+			<div class="mb-6 sm:mb-8">
+				<h2 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+				<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+					<Link
+						v-for="action in quickActions"
+						:key="action.title"
+						:href="action.link"
+						:class="action.color"
+						class="text-white rounded-lg shadow-md p-5 sm:p-6 transition-all duration-200 transform hover:scale-105 touch-manipulation"
+					>
+						<h3 class="text-lg sm:text-xl font-semibold mb-2">{{ action.title }}</h3>
+						<p class="text-white/90 text-sm">{{ action.description }}</p>
+					</Link>
+				</div>
+			</div>
+		</template>
 
 		<!-- Recent Orders -->
 		<div class="bg-white rounded-xl shadow-md p-4 sm:p-6">

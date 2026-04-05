@@ -44,6 +44,12 @@ const displayUsers = computed(() => props.users.map(u => ({
 
 const roleOptions = computed(() => props.roles.map(r => ({ value: r.name, label: r.name })));
 
+const formatDate = (dateString: string) => {
+	return new Date(dateString).toLocaleString('sv-SE', {
+		timeZone: 'Asia/Manila',
+	});
+};
+
 // Modal Handlers
 const openAddModal = () => (showAdd.value = true);
 const openEditModal = (user: any) => {
@@ -80,7 +86,11 @@ const openDeleteModal = (user: any) => {
 			:rows="displayUsers"
 			@edit="openEditModal"
 			@delete="openDeleteModal"
-		/>
+		>
+			<template #cell-created_at="{ value }">
+				{{ formatDate(value) }}
+			</template>
+		</DataTable>
 
 		<!-- Add User Modal -->
 		<FormModal

@@ -41,7 +41,23 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function customerUser(): \App\Models\User
 {
-    // ..
+    $user = \App\Models\User::factory()->create(['password_changed_at' => now()->subDays(2)]);
+    $user->assignRole('Customer');
+    return $user;
+}
+
+function managerUser(): \App\Models\User
+{
+    $user = \App\Models\User::factory()->create(['password_changed_at' => now()->subDays(2)]);
+    $user->assignRole('Product Manager');
+    return $user;
+}
+
+function adminUser(): \App\Models\User
+{
+    $user = \App\Models\User::factory()->create(['password_changed_at' => now()->subDays(2)]);
+    $user->assignRole('Super Admin');
+    return $user;
 }

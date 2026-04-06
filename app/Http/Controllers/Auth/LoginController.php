@@ -30,7 +30,7 @@ class LoginController extends Controller
         // [2.4.3] Log successful login
         activity()
             ->causedBy($user)
-            ->withProperties(['ip' => $request->ip()])
+            ->withProperties(['IP' => $request->ip()])
             ->log('login');
 
         return redirect()->intended(route('dashboard'));

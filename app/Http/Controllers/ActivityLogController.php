@@ -54,7 +54,6 @@ class ActivityLogController extends Controller
 
         $actions = Activity::select('description')
             ->distinct()
-            ->whereIn('description', ['created', 'updated', 'deleted', 'restored'])
             ->pluck('description')
             ->sort()
             ->values();

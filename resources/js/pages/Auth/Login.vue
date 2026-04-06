@@ -43,8 +43,8 @@ const submit = () => {
         </div>
 
         <!-- Generic login error (does not reveal which field failed) -->
-        <div v-if="form.errors.login" class="mb-4 text-red-600 text-sm text-center">
-          {{ form.errors.login }}
+        <div v-if="(form.errors as Record<string, string>).login" class="mb-4 text-red-600 text-sm text-center">
+          {{ (form.errors as Record<string, string>).login }}
         </div>
 
         <!-- Email -->

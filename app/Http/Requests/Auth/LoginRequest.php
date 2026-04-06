@@ -55,7 +55,7 @@ class LoginRequest extends FormRequest
             // [2.4.6] Log failed login attempt
             activity()
                 ->causedBy($user)
-                ->withProperties(['ip' => $this->ip(), 'email' => $this->input('email')])
+                ->withProperties(['IP' => $this->ip(), 'email' => $this->input('email')])
                 ->log('login_failed');
 
             throw ValidationException::withMessages([

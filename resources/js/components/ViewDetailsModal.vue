@@ -20,6 +20,12 @@ const emit = defineEmits(['close', 'saveRemarks']);
 
 const remarks = ref(props.model?.remarks || '');
 
+const acronyms = new Set(['ip', 'id', 'url', 'api']);
+const formatKey = (key: string) =>
+	key.replace(/_/g, ' ').replace(/\b\w+/g, (word) =>
+		acronyms.has(word.toLowerCase()) ? word.toUpperCase() : word.charAt(0).toUpperCase() + word.slice(1)
+	);
+
 // Emit remarks when saving
 const saveRemarks = () => {
 	if (remarks.value.trim() === '') return;
@@ -57,7 +63,7 @@ const saveRemarks = () => {
 				<table class="w-full text-sm border border-gray-200 rounded">
 					<tbody>
 						<tr v-for="(val, key) in model.properties" :key="key" class="border-t border-gray-100">
-							<td class="p-2 font-medium capitalize w-1/3 text-gray-600">{{ String(key).replace(/_/g, ' ') }}</td>
+							<td class="p-2 font-medium w-1/3 text-gray-600">{{ formatKey(String(key)) }}</td>
 							<td class="p-2">
 								<template v-if="Array.isArray(val)">{{ val.length ? val.join(', ') : '—' }}</template>
 								<template v-else>{{ val ?? '—' }}</template>
@@ -86,9 +92,9 @@ const saveRemarks = () => {
 					<tbody>
                         <!-- For Created: Show attributes as New -->
                         <template v-if="model.description === 'created' && model.properties.attributes">
-                             <tr v-for="(val, key) in model.properties.attributes" :key="key">
-                                <td class="p-2 font-medium capitalize">{{ String(key).replace('_', ' ') }}</td>
-                                <td class="p-2 text-green-700 font-semibold">{{ val }}</td>
+                             <tr v-for="(val, key) in model.properties.attributes" :key="key" class="border-t border-gray-100">
+                                <td class="p-2 font-medium w-1/3 text-gray-600">{{ formatKey(String(key)) }}</td>
+                                <td class="p-2">{{ val }}</td>
                             </tr>
                         </template>
 

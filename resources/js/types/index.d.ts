@@ -22,6 +22,11 @@ export type AppPageProps<T extends Record<string, unknown> = Record<string, unkn
 	quote: { message: string; author: string };
 	auth: Auth;
 	sidebarOpen: boolean;
+	logo?: string;
+	flash?: {
+		status?: string;
+		[key: string]: string | undefined;
+	};
 };
 
 export interface User {

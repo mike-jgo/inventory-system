@@ -22,7 +22,7 @@ class PasswordController extends Controller
     {
         $request->validate([
             'current_password' => ['required', 'string', 'current_password'],
-            'password'         => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
+            'password'         => ['required', 'confirmed', 'max:128', Password::min(8)->mixedCase()->numbers()->symbols()],
         ]);
 
         // fresh() after validation so we read the absolute latest state from DB

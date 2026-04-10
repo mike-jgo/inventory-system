@@ -6,6 +6,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -34,6 +35,20 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         // [2.4.1] Never expose stack traces or debug info to users
         $exceptions->dontReportDuplicates();
+
+        // [2.4.6] Log unauthenticated access attempts
+        // NOTE: AuthenticationException is in Laravel's $dontReport, so report() never fires.
+        // Logging is done in render() instead; returning null lets the default login redirect proceed.
+        $exceptions->render(function (AuthenticationException $e, \Illuminate\Http\Request $request) {
+            activity()
+                ->withProperties([
+                    'url' => $request->url(),
+                    'ip'  => $request->ip(),
+                ])
+                ->log('unauthenticated_access');
+
+            return null;
+        });
 
         // [2.4.5] Log all input validation failures
         // NOTE: ValidationException is in Laravel's $internalDontReport, so report() never fires.

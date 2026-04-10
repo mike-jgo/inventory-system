@@ -22,9 +22,9 @@ class InventoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'supplier' => 'required|string|max:255',
-            'quantity' => 'required|numeric|min:0',
-            'cost_per_unit' => 'required|numeric|min:0',
-            'reorder_level' => 'nullable|numeric|min:0',
+            'quantity' => 'required|numeric|min:0|max:99999999.99',
+            'cost_per_unit' => 'required|numeric|min:0|max:99999999.99',
+            'reorder_level' => 'nullable|numeric|min:0|max:99999999.99',
         ]);
 
         $inventory = Inventory::create($validated);
@@ -37,9 +37,9 @@ class InventoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'supplier' => 'required|string|max:255',
-            'quantity' => 'required|numeric|min:0',
-            'cost_per_unit' => 'required|numeric|min:0',
-            'reorder_level' => 'nullable|numeric|min:0',
+            'quantity' => 'required|numeric|min:0|max:99999999.99',
+            'cost_per_unit' => 'required|numeric|min:0|max:99999999.99',
+            'reorder_level' => 'nullable|numeric|min:0|max:99999999.99',
         ]);
 
         $inventory->update($validated);

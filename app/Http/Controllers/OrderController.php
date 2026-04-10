@@ -83,10 +83,10 @@ class OrderController extends Controller
 
             'items' => 'required|array|min:1',
             'items.*.id' => 'required|exists:items,id',
-            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.quantity' => 'required|integer|min:1|max:9999',
 
             'payment_method' => 'required|in:cash,gcash',
-            'amount_paid' => 'required_if:payment_method,cash|nullable|numeric|min:0',
+            'amount_paid' => 'required_if:payment_method,cash|nullable|numeric|min:0|max:99999999.99',
             'payment_reference' => 'required_if:payment_method,gcash|nullable|string|max:255',
         ]);
 
@@ -245,10 +245,10 @@ class OrderController extends Controller
 
             'items' => 'required|array|min:1',
             'items.*.id' => 'required|exists:items,id',
-            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.quantity' => 'required|integer|min:1|max:9999',
 
             'payment_method' => 'required|in:cash,gcash',
-            'amount_paid' => 'required_if:payment_method,cash|nullable|numeric|min:0',
+            'amount_paid' => 'required_if:payment_method,cash|nullable|numeric|min:0|max:99999999.99',
             'payment_reference' => 'required_if:payment_method,gcash|nullable|string|max:255',
         ]);
 

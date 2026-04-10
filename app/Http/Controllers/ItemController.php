@@ -27,8 +27,8 @@ class ItemController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'quantity' => 'required|integer|min:0',
-            'price' => 'required|numeric|min:0',
+            'quantity' => 'required|integer|min:0|max:1000000',
+            'price' => 'required|numeric|min:0|max:99999999.99',
         ]);
 
         $item = Item::create($validated);
@@ -41,8 +41,8 @@ class ItemController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'quantity' => 'required|integer|min:0',
-            'price' => 'required|numeric|min:0',
+            'quantity' => 'required|integer|min:0|max:1000000',
+            'price' => 'required|numeric|min:0|max:99999999.99',
         ]);
 
         $item->update($validated);

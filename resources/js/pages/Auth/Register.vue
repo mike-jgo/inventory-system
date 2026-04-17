@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link, useForm } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
+import PasswordInput from '@/components/PasswordInput.vue';
 
 const form = useForm({
 	name: '',
@@ -51,12 +52,7 @@ const submit = () => {
 				<!-- Password -->
 				<div class="mb-4">
 					<label class="block mb-1 text-gray-700">Password</label>
-					<input
-						v-model="form.password"
-						type="password"
-						class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-						required
-					/>
+					<PasswordInput v-model="form.password" required />
 					<ul class="mt-1 text-xs text-gray-500 space-y-0.5 list-disc list-inside">
 						<li>At least 8 characters</li>
 						<li>At least one uppercase letter</li>
@@ -71,12 +67,7 @@ const submit = () => {
 				<!-- Confirm Password -->
 				<div class="mb-4">
 					<label class="block mb-1 text-gray-700">Confirm Password</label>
-					<input
-						v-model="form.password_confirmation"
-						type="password"
-						class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-						required
-					/>
+					<PasswordInput v-model="form.password_confirmation" required />
 					<div v-if="form.errors.password_confirmation" class="text-red-600 text-sm mt-1">
 						{{ form.errors.password_confirmation }}
 					</div>

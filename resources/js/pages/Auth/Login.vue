@@ -2,6 +2,7 @@
 import { Link, useForm, usePage } from '@inertiajs/vue3'
 import { route } from 'ziggy-js'
 import { computed } from 'vue'
+import PasswordInput from '@/components/PasswordInput.vue'
 
 const page = usePage()
 const logo = computed(() => page.props.logo as string)
@@ -66,12 +67,7 @@ const submit = () => {
               Forgot password?
             </Link>
           </div>
-          <input
-            v-model="form.password"
-            type="password"
-            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
+          <PasswordInput v-model="form.password" required />
         </div>
 
         <!-- Remember Me -->
@@ -98,7 +94,7 @@ const submit = () => {
       </form>
 
       <p class="mt-4 text-center text-sm">
-        Don’t have an account?
+        Don't have an account?
         <Link
           :href="route('register')"
           class="text-blue-500 hover:underline"
